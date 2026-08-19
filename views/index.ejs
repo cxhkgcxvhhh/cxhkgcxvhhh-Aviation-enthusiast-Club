@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cxhkgcxvhhh Aviation enthusiast Club 圖庫</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --shadow-sm: 0 2px 10px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 導航列 --- */
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .nav-brand a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .nav-btn.secondary {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .nav-btn.secondary:hover {
+            background: var(--card-bg);
+            border-color: #cbd5e1;
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .user-info img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* --- 主內容 --- */
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 30px 20px;
+            flex: 1;
+        }
+
+        h2 {
+            margin: 30px 0 18px 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+
+        h2::before {
+            content: "";
+            display: inline-block;
+            width: 5px;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--primary-color), #60a5fa);
+            border-radius: 3px;
+        }
+
+        /* --- 歡迎區 --- */
+        .hero-section {
+            background: linear-gradient(135deg, #1e3a5f 0%, #3b82f6 100%);
+            border-radius: var(--radius-lg);
+            padding: 50px 40px;
+            color: white;
+            margin-bottom: 35px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero-section::before {
+            content: "✈️";
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 120px;
+            opacity: 0.1;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .hero-actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .hero-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-btn.primary {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+        }
+
+        .hero-btn.primary:hover {
+            background: #f8fafc;
+        }
+
+        /* --- 相片網格 --- */
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .photo-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+        }
+
+        .photo-card:active {
+            transform: scale(0.98);
+        }
+
+        .img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .photo-card:hover img {
+            transform: scale(1.08);
+        }
+
+        .css-watermark {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            font-weight: 600;
+            pointer-events: none;
+            letter-spacing: 0.3px;
+        }
+
+        .photo-info {
+            padding: 16px;
+        }
+
+        .photo-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .photo-airline {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .photo-reg {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .photo-route {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .photo-actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .photo-action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            transition: all 0.2s;
+            padding: 5px;
+        }
+
+        .photo-action-btn:hover {
+            color: var(--text-main);
+            transform: scale(1.1);
+        }
+
+        .photo-action-btn.liked {
+            color: #ef4444;
+        }
+
+        .photo-action-btn.favorited {
+            color: #f59e0b;
+        }
+
+        .photo-photographer {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* --- 登入提示 --- */
+        .login-prompt {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
+
+        .login-prompt h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .login-prompt p {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .google-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .google-btn:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            border-color: #cbd5e1;
+        }
+
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* --- 管理員提示 --- */
+        .admin-banner {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .admin-banner a {
+            color: white;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        /* --- 載入中 --- */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-weight: 600;
+            grid-column: 1 / -1;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- 空狀態 --- */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* --- 頁尾 --- */
+        .site-footer {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg);
+            font-weight: 500;
+            margin-top: auto;
+        }
+
+        /* --- 響應式 --- */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav-brand {
+                font-size: 0.95rem;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+
+            .hero-section {
+                padding: 35px 25px;
+            }
+
+            .hero-title {
+                font-size: 1.5rem;
+            }
+
+            .hero-section::before {
+                font-size: 80px;
+            }
+
+            .photos-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .photo-card .img-wrapper {
+                height: 160px;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="/">✈️ cxhkgcxvhhh Aviation enthusiast Club 圖庫</a>
+        </div>
+        <div class="nav-links">
+            <% if (user) { %>
+                <a href="/upload" class="nav-btn secondary">📤 上載照片</a>
+                <% if (user.is_admin) { %>
+                    <a href="/admin" class="nav-btn">🛡️ 審核後台</a>
+                <% } %>
+                <div class="user-info">
+                    <img src="<%= user.avatar_url || 'https://via.placeholder.com/32' %>" alt="avatar">
+                    <span><%= user.display_name %></span>
+                    <span class="score-badge">⭐ <%= user.score || 0 %></span>
+                    <a href="/auth/logout" class="nav-btn secondary">登出</a>
+                </div>
+            <% } else { %>
+                <a href="/auth/google" class="nav-btn">🔑 Google 登入</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <div class="container">
+        <% if (user && user.is_admin) { %>
+            <div class="admin-banner">
+                <span>👑 管理員模式：你有 <%= pendingCount || 0 %> 張照片待審核</span>
+                <a href="/admin">前往審核 →</a>
+            </div>
+        <% } %>
+
+        <div class="hero-section">
+            <div class="hero-title">航空攝影作品集</div>
+            <div class="hero-subtitle">分享你嘅飛機照片，記錄每一次飛行嘅感動</div>
+            <div class="hero-actions">
+                <% if (!user) { %>
+                    <a href="/auth/google" class="hero-btn primary">立即登入開始分享</a>
+                <% } else { %>
+                    <a href="/upload" class="hero-btn primary">📤 上載新照片</a>
+                <% } %>
+                <a href="#photos" class="hero-btn">瀏覽作品</a>
+            </div>
+        </div>
+
+        <h2 id="photos">最新飛機照片</h2>
+        <div id="photos-grid" class="photos-grid">
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <div>載入中...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        Powered by cxhkgcxvhhh Aviation enthusiast Club © 2026
+    </footer>
+
+    <script>
+        let currentUser = null;
+
+        async function init() {
+            // 檢查登入狀態
+            try {
+                const res = await fetch('/auth/user');
+                const data = await res.json();
+                if (data.loggedIn) {
+                    currentUser = data.user;
+                }
+            } catch (e) {
+                console.log('Not logged in');
+            }
+
+            // 載入照片
+            loadPhotos();
+        }
+
+        async function loadPhotos() {
+            const container = document.getElementById('photos-grid');
+            
+            try {
+                const res = await fetch('/api/photos');
+                const photos = await res.json();
+
+                if (photos.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📷</div>
+                            <h3>暫無照片</h3>
+                            <p>成為第一個上載飛機照片嘅人！</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = photos.map(photo => `
+                    <div class="photo-card" onclick="location.href='/photo/${photo.id}'">
+                        <div class="img-wrapper">
+                            <img src="${photo.photo_path}" alt="${photo.airline}" loading="lazy"
+                                 onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+                            <div class="css-watermark">&copy; ${escapeHtml(photo.display_name || 'Unknown')}</div>
+                        </div>
+                        <div class="photo-info">
+                            <div class="photo-meta-row">
+                                <div class="photo-airline">${escapeHtml(photo.airline)}</div>
+                                <div class="photo-reg">${escapeHtml(photo.aircraft_registration)}</div>
+                            </div>
+                            <div class="photo-route">${escapeHtml(photo.destination)} (${escapeHtml(photo.destination_code)})</div>
+                            <div class="photo-actions-bar">
+                                <button class="photo-action-btn ${photo.user_liked ? 'liked' : ''}" 
+                                        onclick="event.stopPropagation(); toggleLike(${photo.id})">
+                                    <span>${photo.user_liked ? '❤️' : '🤍'}</span>
+                                    <span>${photo.likes_count || 0}</span>
+                                </button>
+                                <button class="photo-action-btn ${photo.user_favorited ? 'favorited' : ''}"
+                                        onclick="event.stopPropagation(); toggleFavorite(${photo.id})">
+                                    <span>${photo.user_favorited ? '📂' : '📁'}</span>
+                                    <span>${photo.favorites_count || 0}</span>
+                                </button>
+                                <span class="photo-photographer">${escapeHtml(photo.display_name || '')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>載入失敗</h3>
+                        <p>請重新整理頁面再試</p>
+                    </div>
+                `;
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function toggleLike(photoId) {
+            if (!currentUser) {
+                alert('請先登入');
+                location.href = '/auth/google';
+                return;
+            }
+            try {
+                await fetch(`/api/photos/${photoId}/like`, { method: 'POST' });
+                loadPhotos();
+            } catch (e) {
+                alert('操作失敗');
+            }
+        }
+
+        async function toggleFavorite(photoId) {
+            if (!currentUser) {
+                alert('請先登入');
+                location.href = '/auth/google';
+                return;
+            }
+            try {
+                await fetch(`/api/photos/${photoId}/favorite`, { method: 'POST' });
+                loadPhotos();
+            } catch (e) {
+                alert('操作失敗');
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

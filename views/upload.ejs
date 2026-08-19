@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上載照片 - cxhkgcxvhhh Aviation enthusiast Club 圖庫</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+        }
+
+        .nav-brand a {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #0f172a;
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn:hover {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.secondary {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+
+        .nav-btn.secondary:hover {
+            background: white;
+            border-color: #cbd5e1;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px;
+            flex: 1;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 35px;
+            font-weight: 500;
+        }
+
+        .upload-form {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #3b82f6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .form-group label .required {
+            color: #ef4444;
+            margin-left: 3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0f172a;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 50px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-area:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.03);
+        }
+
+        .file-upload-area.has-file {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .file-upload-area input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 5px;
+        }
+
+        .upload-hint {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .file-name {
+            font-size: 0.9rem;
+            color: #22c55e;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .auto-fill-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .auto-fill-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .auto-fill-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.25);
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.35);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .message.success {
+            display: flex;
+            background: rgba(34, 197, 94, 0.1);
+            color: #15803d;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .message.error {
+            display: flex;
+            background: rgba(239, 68, 68, 0.1);
+            color: #b91c1c;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .site-footer {
+            text-align: center;
+            padding: 25px 20px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .upload-form {
+                padding: 25px 20px;
+            }
+            .navbar {
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="/">✈️ cxhkgcxvhhh Aviation enthusiast Club 圖庫</a>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-btn secondary">← 返回首頁</a>
+            <a href="/auth/logout" class="nav-btn secondary">登出</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>📤 上載飛機照片</h1>
+        <p class="subtitle">填寫航班資料，分享你嘅航空攝影作品</p>
+
+        <form id="upload-form" class="upload-form" enctype="multipart/form-data">
+            
+            <div class="form-section">
+                <div class="section-title">📷 選擇照片</div>
+                <div class="file-upload-area" id="dropZone">
+                    <input type="file" name="photo" accept="image/*" required id="fileInput">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">點擊或拖曳照片上載</div>
+                    <div class="upload-hint">支援 JPG、PNG、WEBP 格式，最大 10MB</div>
+                    <div class="file-name" id="fileName"></div>
+                    <img id="preview" class="preview-image" style="display:none;">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">✈️ 航班資料</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>航空公司 <span class="required">*</span></label>
+                        <input type="text" name="airline" placeholder="例如：國泰航空 Cathay Pacific" required>
+                    </div>
+                    <div class="form-group">
+                        <label>航班號 <span class="required">*</span></label>
+                        <input type="text" name="flight_number" placeholder="例如：CX520" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>目的地 <span class="required">*</span></label>
+                        <input type="text" name="destination" placeholder="例如：東京 Tokyo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>目的地代碼（3字）<span class="required">*</span></label>
+                        <input type="text" name="destination_code" placeholder="例如：HND" maxlength="3" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>飛機註冊號 <span class="required">*</span></label>
+                        <input type="text" name="aircraft_registration" id="regInput" placeholder="例如：B-HNR" required>
+                    </div>
+                    <div class="form-group">
+                        <label>飛機型號</label>
+                        <input type="text" name="aircraft_model" id="modelInput" placeholder="例如：Boeing 777-300ER">
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label>引擎型號</label>
+                    <input type="text" name="engine_type" id="engineInput" placeholder="例如：GE90-115B">
+                    <button type="button" class="auto-fill-btn" id="autoFillBtn" onclick="autoFillEngine()">
+                        🔍 自動搜尋引擎型號
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">✈️ 提交審核</button>
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+
+    <footer class="site-footer">
+        Powered by cxhkgcxvhhh Aviation enthusiast Club © 2026
+    </footer>
+
+    <script>
+        // 檔案預覽
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const dropZone = document.getElementById('dropZone');
+            const fileName = document.getElementById('fileName');
+            const preview = document.getElementById('preview');
+            
+            if (file) {
+                dropZone.classList.add('has-file');
+                fileName.textContent = `已選擇：${file.name}`;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 自動搜尋引擎型號
+        function autoFillEngine() {
+            const model = document.getElementById('modelInput').value.trim().toUpperCase();
+            const reg = document.getElementById('regInput').value.trim().toUpperCase();
+            const btn = document.getElementById('autoFillBtn');
+            
+            if (!model && !reg) {
+                alert('請先輸入飛機型號或註冊號');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '🔍 搜尋中...';
+
+            // 模擬 API 搜尋（實際可接真實航空資料庫）
+            setTimeout(() => {
+                const engineMap = {
+                    'B737': 'CFM56-7B',
+                    'B747': 'GEnx-2B / Trent 1000',
+                    'B777': 'GE90-115B / Trent 800',
+                    'B787': 'GEnx / Trent 1000',
+                    'A320': 'CFM56-5B / V2500',
+                    'A321': 'CFM56-5B / V2500',
+                    'A330': 'Trent 700 / CF6-80E',
+                    'A350': 'Trent XWB',
+                    'A380': 'Trent 900 / GP7200'
+                };
+
+                let engine = '未知引擎型號';
+                for (const [key, value] of Object.entries(engineMap)) {
+                    if (model.includes(key)) {
+                        engine = value;
+                        break;
+                    }
+                }
+
+                document.getElementById('engineInput').value = engine;
+                btn.disabled = false;
+                btn.textContent = '🔍 自動搜尋引擎型號';
+            }, 800);
+        }
+
+        // 上載表單
+        document.getElementById('upload-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const msgDiv = document.getElementById('message');
+            const btn = document.querySelector('.submit-btn');
+            
+            btn.textContent = '⏳ 上載中...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/photos/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await res.json();
+                
+                msgDiv.style.display = 'flex';
+                if (data.success) {
+                    msgDiv.className = 'message success';
+                    msgDiv.innerHTML = '✅ ' + data.message;
+                    this.reset();
+                    document.getElementById('preview').style.display = 'none';
+                    document.getElementById('dropZone').classList.remove('has-file');
+                    document.getElementById('fileName').textContent = '';
+                } else {
+                    msgDiv.className = 'message error';
+                    msgDiv.innerHTML = '❌ 上載失敗：' + (data.error || '未知錯誤');
+                }
+                
+            } catch (error) {
+                msgDiv.className = 'message error';
+                msgDiv.innerHTML = '❌ 網絡錯誤，請重試';
+            }
+            
+            btn.textContent = '✈️ 提交審核';
+            btn.disabled = false;
+        });
+    </script>
+</body>
+</html>
