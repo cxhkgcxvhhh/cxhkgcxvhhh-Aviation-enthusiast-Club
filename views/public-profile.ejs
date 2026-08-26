@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= targetUser.name %> — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft JhengHei', 'PingFang HK', Arial, sans-serif; background: #f4f8fc; color: #1a2b3c; }
+    .wrap { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+    .profile-card { background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 8px 30px rgba(25,60,100,0.10); margin-bottom: 26px; }
+    .pc-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .pc-left { display: flex; align-items: center; gap: 16px; }
+    .pc-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+    .pc-initial { width: 72px; height: 72px; border-radius: 50%; background: #1976d2; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; }
+    .pc-name { font-size: 22px; font-weight: 800; color: #0d2137; display: flex; align-items: center; gap: 6px; }
+    .pc-role { font-size: 13px; color: #5f7285; margin-top: 4px; }
+    .tier-badges { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .tier-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+    .tb-junior { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+    .tb-senior { background: #fff8e1; color: #b8860b; border: 1px solid #f0d878; }
+    .level-box { text-align: center; background: rgba(25,118,210,0.08); border: 1.5px solid rgba(25,118,210,0.35); border-radius: 18px; padding: 14px 26px; }
+    .level-box .lv-label { font-size: 12px; color: #5f7285; margin-bottom: 2px; }
+    .level-box .lv-num { font-size: 30px; font-weight: 900; color: #1976d2; line-height: 1; }
+    .level-box .lv-max { font-size: 11px; color: #8ba0b3; margin-top: 3px; }
+    .section-card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 8px 30px rgba(25,60,100,0.10); }
+    .section-card h2 { font-size: 18px; margin-bottom: 14px; color: #0d2137; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .mini-card { background: #f4f8fc; border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; display: block; }
+    .mini-card img { width: 100%; height: 130px; object-fit: cover; display: block; }
+    .mini-info { padding: 10px 12px; }
+    .mini-title { font-size: 13px; font-weight: 700; }
+    .mini-sub { font-size: 11px; color: #5f7285; margin-top: 2px; }
+    .empty { color: #8ba0b3; font-size: 13px; padding: 10px 0; }
+    .follow-btn { margin-top: 10px; padding: 8px 22px; border-radius: 999px; border: 2px solid #1976d2; background: transparent; color: #1976d2; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .18s ease; }
+    .follow-btn.on { background: #1976d2; color: #fff; }
+    .follow-count { font-size: 12px; color: #5f7285; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <% function pStar() { return 'M12 0l2.5 2.4 3.4-.5 1.1 3.1 3.1 1.1-.5 3.4L24 12l-2.4 2.5.5 3.4-3.1 1.1-1.1 3.1-3.4-.5L12 24l-2.5-2.4-3.4.5-1.1-3.1-3.1-1.1.5-3.4L0 12l2.4-2.5-.5-3.4 3.1-1.1 1.1-3.1 3.4.5z'; } %>
+  <% function pCheck() { return '<path fill="#ffffff" d="M10.7 15.9l-3.2-3.2 1.4-1.4 1.8 1.8 4.6-4.6 1.4 1.4z"/>'; } %>
+  <% function pBadge(u) {
+    if (u && u.isSuper) return '<svg width="19" height="19" viewBox="0 0 24 24"><path fill="#f5b800" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    if (u && u.role === 'admin') return '<svg width="19" height="19" viewBox="0 0 24 24"><path fill="#1d9bf0" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    var s = (u && u.score != null) ? u.score : 0;
+    if (s >= 1000) return '<svg width="19" height="19" viewBox="0 0 24 24"><defs><linearGradient id="ppRb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff004c"><animate attributeName="stop-color" values="#ff004c;#ff8a00;#ffee00;#2fd65a;#2f9bff;#b04cff;#ff004c" dur="3s" repeatCount="indefinite"/></stop><stop offset="100%" stop-color="#2f9bff"><animate attributeName="stop-color" values="#2f9bff;#b04cff;#ff004c;#ff8a00;#ffee00;#2fd65a;#2f9bff" dur="3s" repeatCount="indefinite"/></stop></linearGradient></defs><path fill="url(#ppRb)" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    if (s >= 50) return '<svg width="19" height="19" viewBox="0 0 24 24"><defs><linearGradient id="ppBp" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2f9bff"/><stop offset="100%" stop-color="#9b30ff"/></linearGradient></defs><path fill="url(#ppBp)" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    if (s >= 30) return '<svg width="19" height="19" viewBox="0 0 24 24"><path fill="#e02424" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    return '';
+  } %>
+  <% var tLv = Math.min(100, Math.floor((targetUser.score || 0) / 10)); %>
+
+  <div class="wrap">
+
+    <div class="profile-card">
+      <div class="pc-row">
+        <div class="pc-left">
+          <% if (targetUser.avatar) { %>
+            <img class="pc-avatar" src="<%= targetUser.avatar %>" referrerpolicy="no-referrer" alt="">
+          <% } else { %>
+            <span class="pc-initial"><%= (targetUser.name || '?').charAt(0).toUpperCase() %></span>
+          <% } %>
+          <div>
+            <div class="pc-name"><%= targetUser.name %> <%- pBadge(targetUser) %></div>
+            <div class="pc-role">
+              <%= targetUser.isSuper ? '👑 總管理員' : (targetUser.role === 'admin' ? '👑 管理員' : '會員') %>
+            </div>
+            <% if (targetUser.role !== 'admin') { %>
+              <div class="tier-badges">
+                <% if ((targetUser.score || 0) >= 20) { %>
+                  <span class="tier-badge tb-senior">🏅 資深飛迷</span>
+                <% } else if ((targetUser.score || 0) >= 10) { %>
+                  <span class="tier-badge tb-junior">🎖️ 初級飛迷</span>
+                <% } %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div class="level-box">
+            <div class="lv-label">等級</div>
+            <div class="lv-num"><%= targetUser.role === 'admin' ? '👑' : tLv %></div>
+            <div class="lv-max"><%= targetUser.role === 'admin' ? '管理員' : ('/ 100 級 · 每 10 分升 1 級') %></div>
+          </div>
+          <% if (user && user.id !== targetUser.id) { %>
+            <button class="follow-btn <%= isFollowing ? 'on' : '' %>" id="followBtn" onclick="toggleFollow()"><%= isFollowing ? '✓ 追蹤緊' : '👥 追蹤' %></button>
+          <% } %>
+          <div class="follow-count"><%= followerCount %> 人追蹤緊</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>📷 <%= targetUser.name %> 嘅作品（<%= photos.length %>）</h2>
+      <% if (photos.length === 0) { %><div class="empty">暫時冇公開嘅相片</div><% } %>
+      <div class="grid">
+        <% photos.forEach(function(p) { %>
+          <a class="mini-card" href="/photo/<%= p.id %>">
+            <img src="<%= p.image_url %>" alt="">
+            <div class="mini-info">
+              <div class="mini-title"><%= p.title %></div>
+              <div class="mini-sub"><%= p.registration %> · <%= p.airline %></div>
+              <% if (p.status !== 'approved') { %>
+                <div class="mini-sub" style="color:#c62828;">（<%= p.status === 'pending' ? '待審核' : (p.status === 'changes_requested' ? '待補充' : '被拒絕') %>）</div>
+              <% } %>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleFollow() {
+      fetch('/api/users/<%= targetUser.id %>/follow', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (!d.ok) { alert('❌ ' + (d.error || '失敗')); return; }
+          var b = document.getElementById('followBtn');
+          b.classList.toggle('on', d.following);
+          b.textContent = d.following ? '✓ 追蹤緊' : '👥 追蹤';
+          location.reload();
+        });
+    }
+  </script>
+</body>
+</html>

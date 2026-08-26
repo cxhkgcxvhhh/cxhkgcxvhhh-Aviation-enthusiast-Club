@@ -1,732 +1,257 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cxhkgcxvhhh Aviation enthusiast Club 圖庫</title>
-    <style>
-        :root {
-            --primary-color: #3b82f6;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --radius-lg: 20px;
-            --radius-md: 14px;
-            --radius-sm: 10px;
-            --shadow-sm: 0 2px 10px rgba(15, 23, 42, 0.04);
-            --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.08);
-            --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.12);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- 導航列 --- */
-        .navbar {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-            padding: 16px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .nav-brand {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            letter-spacing: -0.3px;
-        }
-
-        .nav-brand a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            color: var(--primary-color);
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .nav-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-        }
-
-        .nav-btn.secondary {
-            background: rgba(255, 255, 255, 0.6);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-        }
-
-        .nav-btn.secondary:hover {
-            background: var(--card-bg);
-            border-color: #cbd5e1;
-            color: var(--text-main);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .user-info img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--border-color);
-        }
-
-        .score-badge {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        /* --- 主內容 --- */
-        .container {
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 30px 20px;
-            flex: 1;
-        }
-
-        h2 {
-            margin: 30px 0 18px 0;
-            font-size: 1.3rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-main);
-            letter-spacing: -0.3px;
-        }
-
-        h2::before {
-            content: "";
-            display: inline-block;
-            width: 5px;
-            height: 20px;
-            background: linear-gradient(to bottom, var(--primary-color), #60a5fa);
-            border-radius: 3px;
-        }
-
-        /* --- 歡迎區 --- */
-        .hero-section {
-            background: linear-gradient(135deg, #1e3a5f 0%, #3b82f6 100%);
-            border-radius: var(--radius-lg);
-            padding: 50px 40px;
-            color: white;
-            margin-bottom: 35px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .hero-section::before {
-            content: "✈️";
-            position: absolute;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 120px;
-            opacity: 0.1;
-        }
-
-        .hero-title {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-        }
-
-        .hero-subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        .hero-actions {
-            margin-top: 25px;
-            display: flex;
-            gap: 12px;
-        }
-
-        .hero-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 12px 24px;
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .hero-btn:hover {
-            background: rgba(255, 255, 255, 0.35);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .hero-btn.primary {
-            background: white;
-            color: var(--primary-color);
-            border: none;
-        }
-
-        .hero-btn.primary:hover {
-            background: #f8fafc;
-        }
-
-        /* --- 相片網格 --- */
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .photo-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-        }
-
-        .photo-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-md);
-            border-color: #cbd5e1;
-        }
-
-        .photo-card:active {
-            transform: scale(0.98);
-        }
-
-        .img-wrapper {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-            background: #f1f5f9;
-        }
-
-        .photo-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .photo-card:hover img {
-            transform: scale(1.08);
-        }
-
-        .css-watermark {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(8px);
-            color: white;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            border-radius: 6px;
-            font-weight: 600;
-            pointer-events: none;
-            letter-spacing: 0.3px;
-        }
-
-        .photo-info {
-            padding: 16px;
-        }
-
-        .photo-meta-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .photo-airline {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .photo-reg {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            background: rgba(59, 130, 246, 0.1);
-            padding: 3px 8px;
-            border-radius: 6px;
-        }
-
-        .photo-route {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .photo-actions-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .photo-action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 700;
-            transition: all 0.2s;
-            padding: 5px;
-        }
-
-        .photo-action-btn:hover {
-            color: var(--text-main);
-            transform: scale(1.1);
-        }
-
-        .photo-action-btn.liked {
-            color: #ef4444;
-        }
-
-        .photo-action-btn.favorited {
-            color: #f59e0b;
-        }
-
-        .photo-photographer {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        /* --- 登入提示 --- */
-        .login-prompt {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 50px 30px;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            margin: 40px 0;
-        }
-
-        .login-prompt h3 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            color: var(--text-main);
-        }
-
-        .login-prompt p {
-            color: var(--text-muted);
-            margin-bottom: 25px;
-            font-weight: 500;
-        }
-
-        .google-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            border: 1px solid var(--border-color);
-            padding: 12px 28px;
-            border-radius: var(--radius-sm);
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .google-btn:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-            border-color: #cbd5e1;
-        }
-
-        .google-btn img {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* --- 管理員提示 --- */
-        .admin-banner {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            padding: 12px 20px;
-            border-radius: var(--radius-md);
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
-        }
-
-        .admin-banner a {
-            color: white;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        /* --- 載入中 --- */
-        .loading-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-            font-weight: 600;
-            grid-column: 1 / -1;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 15px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* --- 空狀態 --- */
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-            grid-column: 1 / -1;
-        }
-
-        .empty-state-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-            opacity: 0.3;
-        }
-
-        .empty-state h3 {
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .empty-state p {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        /* --- 頁尾 --- */
-        .site-footer {
-            text-align: center;
-            padding: 30px 20px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border-color);
-            background: var(--card-bg);
-            font-weight: 500;
-            margin-top: auto;
-        }
-
-        /* --- 響應式 --- */
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 12px 16px;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .nav-brand {
-                font-size: 0.95rem;
-            }
-
-            .nav-links {
-                width: 100%;
-                justify-content: flex-end;
-                flex-wrap: wrap;
-            }
-
-            .hero-section {
-                padding: 35px 25px;
-            }
-
-            .hero-title {
-                font-size: 1.5rem;
-            }
-
-            .hero-section::before {
-                font-size: 80px;
-            }
-
-            .photos-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-
-            .photo-card .img-wrapper {
-                height: 160px;
-            }
-
-            .container {
-                padding: 20px 15px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft JhengHei', 'PingFang HK', Arial, sans-serif; background: #f4f8fc; color: #1a2b3c; }
+    .wrap { max-width: 1200px; margin: 36px auto; padding: 0 20px; }
+    .hero { text-align: center; margin-bottom: 30px; }
+    .hero h1 { font-size: 32px; color: #0d2137; }
+    .hero p { color: #41576b; margin-top: 8px; font-size: 15px; }
+
+    /* 六個統計框 — 超透明 */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 30px; }
+    .stat-card {
+      background: rgba(255,255,255,0.10);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 20px;
+      padding: 18px 12px;
+      text-align: center;
+    }
+    .stat-card .num { font-size: 26px; font-weight: 900; color: #0d2137; }
+    .stat-card .lbl { font-size: 12px; color: #41576b; margin-top: 4px; }
+
+    .layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+    .section-title { font-size: 20px; font-weight: 800; color: #0d2137; margin: 26px 0 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+    .p-card { display: block; background: rgba(255,255,255,0.2); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); border-radius: 18px; overflow: hidden; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s; }
+    .p-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(25,60,100,0.18); }
+    .p-card img { width: 100%; height: 130px; object-fit: cover; display: block; }
+    .p-info { padding: 12px 14px; }
+    .p-title { font-size: 14px; font-weight: 700; color: #0d2137; }
+    .p-sub { font-size: 11.5px; color: #5f7285; margin-top: 3px; }
+    .empty { color: #8ba0b3; font-size: 14px; padding: 20px 0; }
+
+    /* 排行榜／新聞 — 超透明框 */
+    .lb-card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .lb-card h3 { font-size: 15px; color: #0d2137; margin-bottom: 12px; }
+    .lb-row { display: flex; align-items: center; gap: 10px; padding: 8px 6px; border-radius: 12px; font-size: 13px; }
+    .lb-row:hover { background: rgba(255,255,255,0.15); }
+    .lb-rank { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; background: rgba(255,255,255,0.35); color: #41576b; }
+    .lb-rank.r1 { background: #ffd54f; color: #6d4c00; }
+    .lb-rank.r2 { background: #e0e0e0; color: #455a64; }
+    .lb-rank.r3 { background: #ffab91; color: #6d3200; }
+    .lb-name { flex: 1; font-weight: 700; color: #0d2137; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lb-count { font-size: 12px; color: #41576b; font-weight: 700; }
+    .lb-empty { font-size: 12px; color: #8ba0b3; padding: 6px; }
+
+    /* 新聞（連縮圖） */
+    .news-item { display: flex; gap: 10px; padding: 10px 6px; border-bottom: 1px solid rgba(255,255,255,0.25); }
+    .news-item:last-of-type { border-bottom: none; }
+    .news-item img { width: 64px; height: 48px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+    .news-item .nt { font-weight: 700; color: #0d2137; font-size: 13px; line-height: 1.4; }
+    .news-item .nc { font-size: 11.5px; color: #41576b; margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .news-item .ns { font-size: 11px; color: #5f7285; margin-top: 3px; }
+    .more-news { display: block; text-align: center; margin-top: 12px; padding: 9px; border-radius: 999px; border: 1.5px solid rgba(25,118,210,0.45); color: #1565c0; font-size: 13px; font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.15); }
+    .more-news:hover { background: rgba(25,118,210,0.15); }
+
+    /* 🖼️ 精選輪播 */
+    .carousel { position: relative; border-radius: 22px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 12px 36px rgba(25,60,100,0.18); }
+    .carousel .slide { display: none; position: relative; text-decoration: none; color: inherit; }
+    .carousel .slide.on { display: block; }
+    .carousel .slide img { width: 100%; height: 380px; object-fit: cover; display: block; }
+    @media (max-width: 700px) { .carousel .slide img { height: 220px; } }
+    .carousel .cap {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 18px 22px; color: #fff;
+      background: linear-gradient(transparent, rgba(10,25,40,0.75));
+    }
+    .carousel .cap .ct { font-size: 17px; font-weight: 800; }
+    .carousel .cap .cs { font-size: 12px; opacity: 0.85; margin-top: 3px; }
+    .carousel .car-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 42px; height: 42px; border-radius: 50%; border: none; cursor: pointer;
+      background: rgba(255,255,255,0.3); color: #fff; font-size: 20px; font-weight: 800;
+      backdrop-filter: blur(6px); transition: background .2s;
+    }
+    .carousel .car-btn:hover { background: rgba(255,255,255,0.55); }
+    .carousel .car-prev { left: 14px; }
+    .carousel .car-next { right: 14px; }
+    .carousel .car-dots { position: absolute; bottom: 12px; right: 18px; display: flex; gap: 6px; }
+    .carousel .car-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,0.45); cursor: pointer; }
+    .carousel .car-dot.on { background: #fff; }
+  </style>
 </head>
 <body>
+  <%- include('partials/header') %>
 
-    <nav class="navbar">
-        <div class="nav-brand">
-            <a href="/">✈️ cxhkgcxvhhh Aviation enthusiast Club 圖庫</a>
-        </div>
-        <div class="nav-links">
-            <% if (user) { %>
-                <a href="/upload" class="nav-btn secondary">📤 上載照片</a>
-                <% if (user.is_admin) { %>
-                    <a href="/admin" class="nav-btn">🛡️ 審核後台</a>
-                <% } %>
-                <div class="user-info">
-                    <img src="<%= user.avatar_url || 'https://via.placeholder.com/32' %>" alt="avatar">
-                    <span><%= user.display_name %></span>
-                    <span class="score-badge">⭐ <%= user.score || 0 %></span>
-                    <a href="/auth/logout" class="nav-btn secondary">登出</a>
-                </div>
-            <% } else { %>
-                <a href="/auth/google" class="nav-btn">🔑 Google 登入</a>
-            <% } %>
-        </div>
-    </nav>
-
-    <div class="container">
-        <% if (user && user.is_admin) { %>
-            <div class="admin-banner">
-                <span>👑 管理員模式：你有 <%= pendingCount || 0 %> 張照片待審核</span>
-                <a href="/admin">前往審核 →</a>
-            </div>
-        <% } %>
-
-        <div class="hero-section">
-            <div class="hero-title">航空攝影作品集</div>
-            <div class="hero-subtitle">分享你嘅飛機照片，記錄每一次飛行嘅感動</div>
-            <div class="hero-actions">
-                <% if (!user) { %>
-                    <a href="/auth/google" class="hero-btn primary">立即登入開始分享</a>
-                <% } else { %>
-                    <a href="/upload" class="hero-btn primary">📤 上載新照片</a>
-                <% } %>
-                <a href="#photos" class="hero-btn">瀏覽作品</a>
-            </div>
-        </div>
-
-        <h2 id="photos">最新飛機照片</h2>
-        <div id="photos-grid" class="photos-grid">
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                <div>載入中...</div>
-            </div>
-        </div>
+  <div class="wrap">
+    <div class="hero">
+      <h1>✈️ cxhkgcxvhhh Aviation enthusiast Club</h1>
+      <p>分享你嘅航空攝影作品，同其他飛機迷一齊交流！</p>
     </div>
 
-    <footer class="site-footer">
-        Powered by cxhkgcxvhhh Aviation enthusiast Club © 2026
-    </footer>
+    <div class="stats" id="statsRow">
+      <div class="stat-card"><div class="num" id="stTotal">—</div><div class="lbl">今日總上傳</div></div>
+      <div class="stat-card"><div class="num" id="stApproved">—</div><div class="lbl">今日已通過</div></div>
+      <div class="stat-card"><div class="num" id="stRejected">—</div><div class="lbl">今日被拒絕</div></div>
+      <div class="stat-card"><div class="num" id="stGallery">—</div><div class="lbl">圖庫總數</div></div>
+      <div class="stat-card"><div class="num" id="stTodayRate">—</div><div class="lbl">今日通過率</div></div>
+      <div class="stat-card"><div class="num" id="stOverallRate">—</div><div class="lbl">整體通過率</div></div>
+    </div>
 
-    <script>
-        let currentUser = null;
+    <div class="layout">
+      <div>
+        <% if (featured.length > 0) { %>
+        <div class="carousel" id="carousel">
+          <% featured.forEach(function(p, i) { %>
+            <a class="slide <%= i === 0 ? 'on' : '' %>" href="/photo/<%= p.id %>">
+              <img src="<%= p.image_url %>" alt="<%= p.title %>">
+              <div class="cap">
+                <div class="ct">⭐ <%= p.title %></div>
+                <div class="cs">📸 <%= p.user_name %><% if (p.registration) { %> · <%= p.registration %><% } %><% if (p.airline) { %> · <%= p.airline %><% } %></div>
+              </div>
+            </a>
+          <% }) %>
+          <% if (featured.length > 1) { %>
+            <button class="car-btn car-prev" onclick="carMove(-1)">‹</button>
+            <button class="car-btn car-next" onclick="carMove(1)">›</button>
+            <div class="car-dots">
+              <% featured.forEach(function(p, i) { %>
+                <span class="car-dot <%= i === 0 ? 'on' : '' %>" onclick="carGo(<%= i %>)"></span>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+        <% } %>
 
-        async function init() {
-            // 檢查登入狀態
-            try {
-                const res = await fetch('/auth/user');
-                const data = await res.json();
-                if (data.loggedIn) {
-                    currentUser = data.user;
-                }
-            } catch (e) {
-                console.log('Not logged in');
-            }
+        <div class="section-title">⭐ 精選作品</div>
+        <% if (featured.length === 0) { %>
+          <div class="empty">暫時未有精選作品 — 管理員可以喺後台將靚相設為精選！</div>
+        <% } %>
+        <div class="grid">
+          <% featured.forEach(function(p) { %>
+            <a class="p-card" href="/photo/<%= p.id %>">
+              <img src="<%= p.image_url %>" alt="<%= p.title %>" loading="lazy">
+              <div class="p-info">
+                <div class="p-title"><%= p.title %></div>
+                <div class="p-sub"><%= p.registration %> · <%= p.airline %></div>
+                <div class="p-sub">📸 <%= p.user_name %></div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
 
-            // 載入照片
-            loadPhotos();
-        }
+        <div class="section-title">🆕 最新作品</div>
+        <% if (latest.length === 0) { %>
+          <div class="empty">暫時未有作品，快啲上載第一張啦！</div>
+        <% } %>
+        <div class="grid">
+          <% latest.forEach(function(p) { %>
+            <a class="p-card" href="/photo/<%= p.id %>">
+              <img src="<%= p.image_url %>" alt="<%= p.title %>" loading="lazy">
+              <div class="p-info">
+                <div class="p-title"><%= p.title %></div>
+                <div class="p-sub"><%= p.registration %> · <%= p.airline %></div>
+                <div class="p-sub">📸 <%= p.user_name %></div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      </div>
 
-        async function loadPhotos() {
-            const container = document.getElementById('photos-grid');
-            
-            try {
-                const res = await fetch('/api/photos');
-                const photos = await res.json();
+      <div>
+        <div class="lb-card">
+          <h3>🏆 圖片貢獻者排行榜</h3>
+          <% if (topContributors.length === 0) { %>
+            <div class="lb-empty">暫時未有數據</div>
+          <% } %>
+          <% topContributors.forEach(function(u, i) { %>
+            <div class="lb-row">
+              <span class="lb-rank <%= i === 0 ? 'r1' : (i === 1 ? 'r2' : (i === 2 ? 'r3' : '')) %>"><%= i + 1 %></span>
+              <span class="lb-name"><%= u.name %></span>
+              <span class="lb-count"><%= u.count %> 📷</span>
+            </div>
+          <% }) %>
+        </div>
 
-                if (photos.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📷</div>
-                            <h3>暫無照片</h3>
-                            <p>成為第一個上載飛機照片嘅人！</p>
-                        </div>
-                    `;
-                    return;
-                }
+        <div class="lb-card">
+          <h3>📈 今日通過王</h3>
+          <% if (topToday.length === 0) { %>
+            <div class="lb-empty">今日暫時未有通過嘅相片</div>
+          <% } %>
+          <% topToday.forEach(function(u, i) { %>
+            <div class="lb-row">
+              <span class="lb-rank <%= i === 0 ? 'r1' : (i === 1 ? 'r2' : (i === 2 ? 'r3' : '')) %>"><%= i + 1 %></span>
+              <span class="lb-name"><%= u.name %></span>
+              <span class="lb-count"><%= u.count %> ✅</span>
+            </div>
+          <% }) %>
+        </div>
 
-                container.innerHTML = photos.map(photo => `
-                    <div class="photo-card" onclick="location.href='/photo/${photo.id}'">
-                        <div class="img-wrapper">
-                            <img src="${photo.photo_path}" alt="${photo.airline}" loading="lazy"
-                                 onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
-                            <div class="css-watermark">&copy; ${escapeHtml(photo.display_name || 'Unknown')}</div>
-                        </div>
-                        <div class="photo-info">
-                            <div class="photo-meta-row">
-                                <div class="photo-airline">${escapeHtml(photo.airline)}</div>
-                                <div class="photo-reg">${escapeHtml(photo.aircraft_registration)}</div>
-                            </div>
-                            <div class="photo-route">${escapeHtml(photo.destination)} (${escapeHtml(photo.destination_code)})</div>
-                            <div class="photo-actions-bar">
-                                <button class="photo-action-btn ${photo.user_liked ? 'liked' : ''}" 
-                                        onclick="event.stopPropagation(); toggleLike(${photo.id})">
-                                    <span>${photo.user_liked ? '❤️' : '🤍'}</span>
-                                    <span>${photo.likes_count || 0}</span>
-                                </button>
-                                <button class="photo-action-btn ${photo.user_favorited ? 'favorited' : ''}"
-                                        onclick="event.stopPropagation(); toggleFavorite(${photo.id})">
-                                    <span>${photo.user_favorited ? '📂' : '📁'}</span>
-                                    <span>${photo.favorites_count || 0}</span>
-                                </button>
-                                <span class="photo-photographer">${escapeHtml(photo.display_name || '')}</span>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
+        <div class="lb-card">
+          <h3>📰 最新航空新聞</h3>
+          <% if (newsList.length === 0) { %>
+            <div class="lb-empty">暫時未有新聞</div>
+          <% } %>
+          <% newsList.forEach(function(n) { %>
+            <div class="news-item">
+              <% if (n.image_url) { %>
+                <img src="<%= n.image_url %>" alt="" loading="lazy">
+              <% } %>
+              <div>
+                <div class="nt"><%= n.title %></div>
+                <div class="nc"><%= n.content %></div>
+                <div class="ns">來源：<%= n.source %> · <%= new Date(n.created_at).toLocaleDateString('zh-HK') %></div>
+              </div>
+            </div>
+          <% }) %>
+          <a class="more-news" href="/news">查看更多新聞 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            } catch (error) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">⚠️</div>
-                        <h3>載入失敗</h3>
-                        <p>請重新整理頁面再試</p>
-                    </div>
-                `;
-            }
-        }
+  <script>
+    // 🖼️ 精選輪播（每 5 秒自動轉）
+    var carIdx = 0;
+    var carSlides = document.querySelectorAll('#carousel .slide');
+    var carDots = document.querySelectorAll('#carousel .car-dot');
+    function carGo(i) {
+      if (carSlides.length === 0) return;
+      carIdx = (i + carSlides.length) % carSlides.length;
+      carSlides.forEach(function (sl, j) { sl.classList.toggle('on', j === carIdx); });
+      carDots.forEach(function (d, j) { d.classList.toggle('on', j === carIdx); });
+    }
+    function carMove(step) { carGo(carIdx + step); }
+    if (carSlides.length > 1) setInterval(function () { carMove(1); }, 5000);
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        async function toggleLike(photoId) {
-            if (!currentUser) {
-                alert('請先登入');
-                location.href = '/auth/google';
-                return;
-            }
-            try {
-                await fetch(`/api/photos/${photoId}/like`, { method: 'POST' });
-                loadPhotos();
-            } catch (e) {
-                alert('操作失敗');
-            }
-        }
-
-        async function toggleFavorite(photoId) {
-            if (!currentUser) {
-                alert('請先登入');
-                location.href = '/auth/google';
-                return;
-            }
-            try {
-                await fetch(`/api/photos/${photoId}/favorite`, { method: 'POST' });
-                loadPhotos();
-            } catch (e) {
-                alert('操作失敗');
-            }
-        }
-
-        init();
-    </script>
+    fetch('/api/stats/today')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        document.getElementById('stTotal').textContent = d.total;
+        document.getElementById('stApproved').textContent = d.approved;
+        document.getElementById('stRejected').textContent = d.rejected;
+        document.getElementById('stGallery').textContent = d.galleryTotal;
+        document.getElementById('stTodayRate').textContent = d.todayRate + '%';
+        document.getElementById('stOverallRate').textContent = d.overallRate + '%';
+      })
+      .catch(function () {});
+  </script>
 </body>
 </html>

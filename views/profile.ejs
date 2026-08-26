@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>個人檔案 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft JhengHei', 'PingFang HK', Arial, sans-serif; background: #f4f8fc; color: #1a2b3c; }
+    .wrap { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+    .profile-card { background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 8px 30px rgba(25,60,100,0.10); margin-bottom: 26px; }
+    .pc-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .pc-left { display: flex; align-items: center; gap: 16px; }
+    .pc-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+    .pc-initial { width: 72px; height: 72px; border-radius: 50%; background: #1976d2; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; }
+    .pc-name { font-size: 22px; font-weight: 800; color: #0d2137; display: flex; align-items: center; gap: 6px; }
+    .pc-role { font-size: 13px; color: #5f7285; margin-top: 4px; }
+    .tier-badges { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .tier-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+    .tb-junior { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+    .tb-senior { background: #fff8e1; color: #b8860b; border: 1px solid #f0d878; }
+    .pc-right { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .level-box { text-align: center; background: rgba(25,118,210,0.08); border: 1.5px solid rgba(25,118,210,0.35); border-radius: 18px; padding: 14px 26px; }
+    .level-box .lv-label { font-size: 12px; color: #5f7285; margin-bottom: 2px; }
+    .level-box .lv-num { font-size: 30px; font-weight: 900; color: #1976d2; line-height: 1; }
+    .level-box .lv-max { font-size: 11px; color: #8ba0b3; margin-top: 3px; }
+    .lv-btn { font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 999px; border: 1.5px solid rgba(25,118,210,0.5); background: rgba(255,255,255,0.25); color: #1565c0; cursor: pointer; }
+    .lv-btn:hover { background: rgba(25,118,210,0.15); }
+    .score-pill { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 700; padding: 4px 14px; border-radius: 999px; background: #e8f5e9; color: #2e7d32; }
+    .score-pill.low { background: #ffebee; color: #c62828; }
+    .section-card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 8px 30px rgba(25,60,100,0.10); margin-bottom: 24px; }
+    .section-card h2 { font-size: 18px; margin-bottom: 14px; color: #0d2137; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .mini-card { background: #f4f8fc; border-radius: 14px; overflow: hidden; }
+    .mini-card img { width: 100%; height: 130px; object-fit: cover; display: block; }
+    .mini-info { padding: 10px 12px; }
+    .mini-title { font-size: 13px; font-weight: 700; }
+    .mini-sub { font-size: 11px; color: #5f7285; margin-top: 2px; }
+    .mini-actions { padding: 0 12px 12px; display: flex; gap: 8px; }
+    .small-btn { font-size: 12px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid rgba(13,33,55,0.3); background: rgba(255,255,255,0.5); cursor: pointer; }
+    .note-box { background: #eaf3fc; border: 1px solid #b3d4f0; border-radius: 12px; padding: 12px 16px; margin: 10px 0; font-size: 13px; }
+    .edit-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 10px; }
+    .edit-form label { font-size: 11px; color: #5f7285; display: block; margin-bottom: 3px; }
+    .edit-form input, .edit-form textarea { width: 100%; padding: 8px 12px; border: 1.5px solid #d7e3ef; border-radius: 10px; font-size: 13px; font-family: inherit; background: #fff; }
+    .notify-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 14px; }
+    .empty { color: #8ba0b3; font-size: 13px; padding: 10px 0; }
+    /* 等級查詢彈窗 */
+    .lv-modal { display: none; position: fixed; inset: 0; background: rgba(10,25,40,0.45); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+    .lv-modal.show { display: flex; }
+    .lv-dialog { background: rgba(255,255,255,0.85); backdrop-filter: blur(24px); border-radius: 22px; border: 1px solid rgba(255,255,255,0.7); padding: 28px 30px; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(10,30,60,0.3); }
+    .lv-dialog h3 { font-size: 18px; color: #0d2137; margin-bottom: 6px; }
+    .lv-dialog .lv-sub { font-size: 12px; color: #5f7285; margin-bottom: 16px; }
+    .lv-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(13,33,55,0.08); }
+    .lv-row:last-of-type { border-bottom: none; }
+    .lv-row .lv-ico { width: 26px; text-align: center; flex-shrink: 0; }
+    .lv-row .lv-txt { font-size: 14px; color: #0d2137; }
+    .lv-row .lv-txt b { font-weight: 800; }
+    .lv-row .lv-txt .req { font-size: 12px; color: #5f7285; margin-left: 6px; }
+    .lv-close { margin-top: 18px; width: 100%; padding: 10px; border-radius: 999px; border: 1.5px solid rgba(13,33,55,0.35); background: rgba(255,255,255,0.3); font-size: 14px; font-weight: 700; cursor: pointer; }
+    .lv-close:hover { background: rgba(255,255,255,0.55); }
+    /* 📢 站方公告 */
+    .ann-add { margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px; }
+    .ann-add input, .ann-add textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #d7e3ef; border-radius: 10px; font-size: 13px; font-family: inherit; background: #fff; resize: vertical; }
+    .ann-add .small-btn { align-self: flex-start; }
+    .ann-row { background: #f4f8fc; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+    .ann-row-t { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; font-size: 14px; color: #0d2137; }
+    .ann-row-m { font-size: 11px; color: #5f7285; font-weight: 400; }
+    .ann-row-c { font-size: 13px; color: #34495e; line-height: 1.8; margin-top: 6px; white-space: pre-wrap; }
+    .ann-del { margin-top: 8px; border-color: rgba(198,40,40,0.4) !important; color: #c62828; }
+    /* 👥 追蹤中 */
+    .fo-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+    .fo-chip { display: flex; align-items: center; gap: 8px; background: #f4f8fc; border-radius: 999px; padding: 6px 14px 6px 6px; text-decoration: none; color: #0d2137; font-size: 13px; font-weight: 700; }
+    .fo-chip:hover { background: #e3f0fb; }
+    .fo-chip img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+    .fo-chip .fo-initial { width: 28px; height: 28px; border-radius: 50%; background: #1976d2; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+    .sh-link { display: inline-block; margin-top: 4px; font-size: 12px; color: #1976d2; text-decoration: none; }
+    .sh-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <% function pStar() { return 'M12 0l2.5 2.4 3.4-.5 1.1 3.1 3.1 1.1-.5 3.4L24 12l-2.4 2.5.5 3.4-3.1 1.1-1.1 3.1-3.4-.5L12 24l-2.5-2.4-3.4.5-1.1-3.1-3.1-1.1.5-3.4L0 12l2.4-2.5-.5-3.4 3.1-1.1 1.1-3.1 3.4.5z'; } %>
+  <% function pCheck() { return '<path fill="#ffffff" d="M10.7 15.9l-3.2-3.2 1.4-1.4 1.8 1.8 4.6-4.6 1.4 1.4z"/>'; } %>
+  <% function pBadge(u, score, size) {
+    var sz = size || 19;
+    if (u && u.isSuper) return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24"><path fill="#f5b800" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    if (u && u.role === 'admin') return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24"><path fill="#1d9bf0" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    var s = score || 0;
+    if (s >= 1000) return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24"><defs><linearGradient id="pfRb' + sz + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff004c"><animate attributeName="stop-color" values="#ff004c;#ff8a00;#ffee00;#2fd65a;#2f9bff;#b04cff;#ff004c" dur="3s" repeatCount="indefinite"/></stop><stop offset="100%" stop-color="#2f9bff"><animate attributeName="stop-color" values="#2f9bff;#b04cff;#ff004c;#ff8a00;#ffee00;#2fd65a;#2f9bff" dur="3s" repeatCount="indefinite"/></stop></linearGradient></defs><path fill="url(#pfRb' + sz + ')" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    if (s >= 50) return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24"><defs><linearGradient id="pfBp' + sz + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2f9bff"/><stop offset="100%" stop-color="#9b30ff"/></linearGradient></defs><path fill="url(#pfBp' + sz + ')" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    if (s >= 30) return '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24"><path fill="#e02424" d="' + pStar() + '"/>' + pCheck() + '</svg>';
+    return '';
+  } %>
+  <% var myLv = Math.min(100, Math.floor((myScore || 0) / 10)); %>
+
+  <div class="wrap">
+
+    <div class="profile-card">
+      <div class="pc-row">
+        <div class="pc-left">
+          <% if (user.avatar) { %>
+            <img class="pc-avatar" src="<%= user.avatar %>" referrerpolicy="no-referrer" alt="">
+          <% } else { %>
+            <span class="pc-initial"><%= (user.name || '?').charAt(0).toUpperCase() %></span>
+          <% } %>
+          <div>
+            <div class="pc-name"><%= user.name %> <%- pBadge(user, myScore) %></div>
+            <div class="pc-role">
+              <%= user.isSuper ? '👑 總管理員' : (user.role === 'admin' ? '👑 管理員' : '會員') %>
+            </div>
+            <% if (user.role !== 'admin') { %>
+              <div class="tier-badges">
+                <% if ((myScore || 0) >= 20) { %>
+                  <span class="tier-badge tb-senior">🏅 資深飛迷</span>
+                <% } else if ((myScore || 0) >= 10) { %>
+                  <span class="tier-badge tb-junior">🎖️ 初級飛迷</span>
+                <% } %>
+              </div>
+              <% if (myScore != null) { %>
+                <span class="score-pill <%= myScore <= 0 ? 'low' : '' %>">⭐ 分數：<%= myScore %></span>
+              <% } %>
+              <div><a class="sh-link" href="/score-history">📜 睇返我嘅分數紀錄 →</a></div>
+            <% } %>
+          </div>
+        </div>
+        <div class="pc-right">
+          <div class="level-box">
+            <div class="lv-label">等級</div>
+            <div class="lv-num"><%= user.role === 'admin' ? '👑' : myLv %></div>
+            <div class="lv-max"><%= user.role === 'admin' ? '管理員' : ('/ 100 級 · 每 10 分升 1 級') %></div>
+          </div>
+          <button class="lv-btn" onclick="document.getElementById('lvModal').classList.add('show')">等級查詢</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>🔔 電郵通知設定</h2>
+      <div class="notify-row">
+        <input type="checkbox" id="ntfLogin" <%= notify.login ? 'checked' : '' %>>
+        <label for="ntfLogin">登入成功通知</label>
+      </div>
+      <div class="notify-row">
+        <input type="checkbox" id="ntfReview" <%= notify.review ? 'checked' : '' %>>
+        <label for="ntfReview">相片審核結果通知</label>
+      </div>
+      <button class="small-btn" onclick="saveNotify()">儲存設定</button>
+      <span id="ntfMsg" style="font-size:12px;color:#2e7d32;margin-left:10px;"></span>
+    </div>
+
+    <% var annList = (typeof announcements !== 'undefined' && announcements) ? announcements : []; %>
+    <div class="section-card">
+      <h2>📢 站方公告</h2>
+      <% if (user.isSuper) { %>
+        <div class="ann-add">
+          <input id="annTitle" placeholder="公告標題">
+          <textarea id="annContent" rows="3" placeholder="公告內容"></textarea>
+          <button class="small-btn" onclick="addAnn()">📢 發佈公告</button>
+          <span id="annMsg" style="font-size:12px;color:#2e7d32;"></span>
+        </div>
+      <% } %>
+      <% if (annList.length === 0) { %>
+        <div class="empty">暫時冇公告</div>
+      <% } else { %>
+        <% annList.forEach(function(a) { %>
+          <div class="ann-row">
+            <div class="ann-row-t">
+              <b><%= a.title %></b>
+              <span class="ann-row-m">由 <%= a.created_by %> · <%= new Date(a.created_at).toLocaleString('zh-HK') %></span>
+            </div>
+            <div class="ann-row-c"><%= a.content %></div>
+            <% if (user.isSuper) { %>
+              <button class="small-btn ann-del" onclick="delAnn(<%= a.id %>)">🗑️ 刪除</button>
+            <% } %>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <div class="section-card">
+      <h2>👥 追蹤中（<%= followingUsers.length %>）</h2>
+      <% if (followingUsers.length === 0) { %><div class="empty">你仲未追蹤任何人，去攝影師嗰頁搵人追蹤啦！</div><% } %>
+      <div class="fo-chips">
+        <% followingUsers.forEach(function(fu) { %>
+          <a class="fo-chip" href="/user/<%= fu.id %>">
+            <% if (fu.avatar) { %>
+              <img src="<%= fu.avatar %>" referrerpolicy="no-referrer" alt="">
+            <% } else { %>
+              <span class="fo-initial"><%= (fu.name || '?').charAt(0).toUpperCase() %></span>
+            <% } %>
+            <%= fu.name %>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>⭐ 我嘅收藏（<%= favPhotos.length %>）</h2>
+      <% if (favPhotos.length === 0) { %><div class="empty">暫時冇收藏嘅相片，去圖鑑撳 ⭐ 收藏啦！</div><% } %>
+      <div class="grid">
+        <% favPhotos.forEach(function(p) { %>
+          <a class="mini-card" href="/photo/<%= p.id %>" style="text-decoration:none;color:inherit;">
+            <img src="<%= p.image_url %>" alt="">
+            <div class="mini-info">
+              <div class="mini-title"><%= p.title %></div>
+              <div class="mini-sub">📸 <%= p.user_name %></div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+
+    <% if (changesPhotos.length > 0) { %>
+    <div class="section-card">
+      <h2>✏️ 需要補充資料（<%= changesPhotos.length %>）</h2>
+      <% changesPhotos.forEach(function(p) { %>
+        <div class="mini-card" style="margin-bottom:18px;">
+          <img src="<%= p.image_url %>" alt="">
+          <div class="mini-info">
+            <div class="mini-title"><%= p.title %></div>
+            <div class="note-box">👑 審核員（<%= p.reviewed_by || '—' %>）需要你補充：<br><b><%= p.admin_note || '—' %></b></div>
+            <div class="edit-form">
+              <div><label>標題</label><input id="c-<%= p.id %>-title" value="<%= p.title %>"></div>
+              <div><label>註冊號</label><input id="c-<%= p.id %>-registration" value="<%= p.registration %>"></div>
+              <div><label>航空公司</label><input id="c-<%= p.id %>-airline" value="<%= p.airline %>"></div>
+              <div><label>航班編號</label><input id="c-<%= p.id %>-flight_number" value="<%= p.flight_number %>"></div>
+              <div><label>機型</label><input id="c-<%= p.id %>-aircraft_type" value="<%= p.aircraft_type %>"></div>
+              <div><label>塗裝</label><input id="c-<%= p.id %>-livery" value="<%= p.livery %>"></div>
+              <div><label>出發地</label><input id="c-<%= p.id %>-origin" value="<%= p.origin %>"></div>
+              <div><label>目的地</label><input id="c-<%= p.id %>-destination" value="<%= p.destination %>"></div>
+              <div><label>拍攝日期</label><input id="c-<%= p.id %>-photo_date" value="<%= p.photo_date %>"></div>
+              <div><label>拍攝地點</label><input id="c-<%= p.id %>-location" value="<%= p.location %>"></div>
+              <div><label>相機設定（選填）</label><input id="c-<%= p.id %>-camera_settings" value="<%= p.camera_settings %>"></div>
+              <div><label>額外資料（選填）</label><input id="c-<%= p.id %>-extra_info" value="<%= p.extra_info %>"></div>
+            </div>
+          </div>
+          <div class="mini-actions">
+            <button class="small-btn" onclick="resubmit(<%= p.id %>)">🔄 重新提交</button>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <div class="section-card">
+      <h2>⏳ 待審核（<%= pending.length %>）</h2>
+      <% if (pending.length === 0) { %><div class="empty">暫時冇待審核嘅相片</div><% } %>
+      <div class="grid">
+        <% pending.forEach(function(p) { %>
+          <div class="mini-card">
+            <img src="<%= p.image_url %>" alt="">
+            <div class="mini-info">
+              <div class="mini-title"><%= p.title %></div>
+              <div class="mini-sub"><%= p.registration %> · <%= p.airline %></div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>✅ 已通過（<%= approved.length %>）</h2>
+      <% if (approved.length === 0) { %><div class="empty">暫時冇已通過嘅相片</div><% } %>
+      <div class="grid">
+        <% approved.forEach(function(p) { %>
+          <a class="mini-card" href="/photo/<%= p.id %>" style="text-decoration:none;color:inherit;">
+            <img src="<%= p.image_url %>" alt="">
+            <div class="mini-info">
+              <div class="mini-title"><%= p.title %></div>
+              <div class="mini-sub"><%= p.registration %> · <%= p.airline %></div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>❌ 被拒絕（<%= rejected.length %>）</h2>
+      <% if (rejected.length === 0) { %><div class="empty">暫時冇被拒絕嘅相片</div><% } %>
+      <div class="grid">
+        <% rejected.forEach(function(p) { %>
+          <div class="mini-card">
+            <img src="<%= p.image_url %>" alt="">
+            <div class="mini-info">
+              <div class="mini-title"><%= p.title %></div>
+              <div class="mini-sub" style="color:#c62828;">原因：<%= p.reject_reason || '無註明' %></div>
+            </div>
+            <div class="mini-actions">
+              <button class="small-btn" onclick="appeal(<%= p.id %>)">📮 上訴</button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 等級查詢彈窗 -->
+  <div class="lv-modal" id="lvModal">
+    <div class="lv-dialog">
+      <h3>✈️ 等級及徽章說明</h3>
+      <div class="lv-sub">每 10 分升 1 級，最高 100 級。分數由審核通過累積。</div>
+
+      <div class="lv-row">
+        <span class="lv-ico">🎖️</span>
+        <span class="lv-txt"><b>初級飛迷</b><span class="req">達到 10 分（1 級）</span></span>
+      </div>
+      <div class="lv-row">
+        <span class="lv-ico">🏅</span>
+        <span class="lv-txt"><b>資深飛迷</b><span class="req">達到 20 分（2 級）</span></span>
+      </div>
+      <div class="lv-row">
+        <span class="lv-ico"><%- pBadge({role:'user'}, 30, 22) %></span>
+        <span class="lv-txt"><b>紅色剔剔</b><span class="req">達到 30 分（3 級）</span></span>
+      </div>
+      <div class="lv-row">
+        <span class="lv-ico"><%- pBadge({role:'user'}, 50, 22) %></span>
+        <span class="lv-txt"><b>藍紫漸變剔剔</b><span class="req">達到 50 分（5 級）</span></span>
+      </div>
+      <div class="lv-row">
+        <span class="lv-ico"><%- pBadge({role:'user'}, 1000, 22) %></span>
+        <span class="lv-txt"><b>彩虹剔剔（動態）</b><span class="req">達到 100 級（1000 分）</span></span>
+      </div>
+      <div class="lv-row">
+        <span class="lv-ico"><%- pBadge({role:'admin'}, 0, 22) %></span>
+        <span class="lv-txt"><b>藍色剔剔</b><span class="req">管理員專屬</span></span>
+      </div>
+      <div class="lv-row">
+        <span class="lv-ico"><%- pBadge({role:'admin', isSuper:true}, 0, 22) %></span>
+        <span class="lv-txt"><b>金色剔剔</b><span class="req">總管理員專屬</span></span>
+      </div>
+
+      <button class="lv-close" onclick="document.getElementById('lvModal').classList.remove('show')">關閉</button>
+    </div>
+  </div>
+
+  <script>
+    // 撳黑底都可以閂
+    document.getElementById('lvModal').addEventListener('click', function (e) {
+      if (e.target === this) this.classList.remove('show');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') document.getElementById('lvModal').classList.remove('show');
+    });
+
+    function saveNotify() {
+      fetch('/api/settings/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          login: document.getElementById('ntfLogin').checked,
+          review: document.getElementById('ntfReview').checked
+        })
+      }).then(function (r) { return r.json(); })
+        .then(function () {
+          document.getElementById('ntfMsg').textContent = '✅ 已儲存';
+          setTimeout(function () { document.getElementById('ntfMsg').textContent = ''; }, 2500);
+        });
+    }
+
+    function resubmit(id) {
+      var fields = ['title','registration','airline','flight_number','aircraft_type','livery','origin','destination','photo_date','location','camera_settings','extra_info'];
+      var body = {};
+      fields.forEach(function (f) {
+        var el = document.getElementById('c-' + id + '-' + f);
+        if (el) body[f] = el.value;
+      });
+      fetch('/api/photos/' + id + '/resubmit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }).then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.ok) { alert('✅ 已重新提交，相片已返去審核隊列！'); location.reload(); }
+          else { alert('❌ ' + (d.error || '失敗')); }
+        });
+    }
+
+    function appeal(id) {
+      fetch('/api/photos/' + id + '/appeal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}'
+      }).then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.ok && d.mailto) window.location.href = d.mailto;
+          else alert('❌ ' + (d.error || '失敗'));
+        });
+    }
+
+    function addAnn() {
+      var title = document.getElementById('annTitle').value.trim();
+      var content = document.getElementById('annContent').value.trim();
+      if (!title || !content) { alert('❌ 標題同內容都要填'); return; }
+      fetch('/api/superadmin/announcements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title, content: content })
+      }).then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.ok) { location.reload(); }
+          else { alert('❌ ' + (d.error || '失敗')); }
+        });
+    }
+
+    function delAnn(id) {
+      if (!confirm('確定刪除呢則公告？')) return;
+      fetch('/api/superadmin/announcements/' + id + '/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}'
+      }).then(function (r) { return r.json(); })
+        .then(function (d

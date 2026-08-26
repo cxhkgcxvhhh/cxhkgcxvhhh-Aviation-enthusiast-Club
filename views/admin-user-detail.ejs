@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= member.name %> 嘅上載紀錄 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
+      background: linear-gradient(180deg, #f4f8fc, #ffffff);
+      min-height: 100vh;
+      color: #1a2b3c;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px 60px; }
+    .back-link {
+      display: inline-block; margin-bottom: 18px; font-size: 14px;
+      color: #1976d2; text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .member-head {
+      display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+      background: #ffffff; border: 1px solid #e3eaf2; border-radius: 14px;
+      padding: 24px; margin-bottom: 24px;
+    }
+    .member-head img.mh-avatar {
+      width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+      border: 3px solid #e3eaf2;
+    }
+    .mh-fallback {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #1976d2; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; font-weight: 700;
+    }
+    .mh-info h1 { font-size: 22px; margin-bottom: 4px; }
+    .mh-meta { font-size: 13px; color: #5f7285; }
+    .role-super { color: #b8860b; font-weight: 700; }
+    .role-admin { color: #1976d2; font-weight: 600; }
+    .ban-note {
+      margin-top: 6px; font-size: 13px; color: #b71c1c;
+      background: #fff5f5; border: 1px solid #f5c6c6; border-radius: 8px;
+      padding: 6px 12px; display: inline-block;
+    }
+    .email-line { font-family: monospace; font-size: 13px; color: #5f7285; }
+
+    .stat-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px; margin-bottom: 24px;
+    }
+    .stat-box {
+      background: #ffffff; border: 1px solid #e3eaf2; border-radius: 14px;
+      padding: 18px; text-align: center;
+    }
+    .stat-box .s-num { font-size: 26px; font-weight: 800; }
+    .stat-box .s-label { font-size: 13px; color: #5f7285; margin-top: 4px; }
+    .c-total { color: #1976d2; }
+    .c-ok { color: #2e7d32; }
+    .c-wait { color: #f9a825; }
+    .c-changes { color: #1976d2; }
+    .c-bad { color: #d32f2f; }
+
+    .card {
+      background: #ffffff; border: 1px solid #e3eaf2; border-radius: 14px;
+      padding: 24px; overflow-x: auto;
+    }
+    .card h2 { font-size: 17px; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+    th {
+      text-align: left; padding: 10px 12px; color: #5f7285; font-weight: 600;
+      border-bottom: 2px solid #e3eaf2; white-space: nowrap;
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid #eef3f8; vertical-align: middle; }
+    tr:hover td { background: #f7fafd; }
+    .thumb {
+      width: 74px; height: 50px; object-fit: cover; border-radius: 8px;
+      border: 1px solid #e3eaf2; display: block;
+    }
+    .st {
+      display: inline-block; padding: 3px 12px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; white-space: nowrap;
+    }
+    .st-approved { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .st-pending { background: #fff8e1; color: #f9a825; border: 1px solid #ffecb3; }
+    .st-rejected { background: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; }
+    .st-changes { background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb; }
+    .sub-note { font-size: 12px; color: #8ba0b3; margin-top: 3px; max-width: 240px; line-height: 1.5; }
+    .empty { text-align: center; color: #8ba0b3; padding: 40px 0; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="wrap">
+    <a class="back-link" href="/admin/users">← 返回會員管理</a>
+
+    <!-- 會員基本資料 -->
+    <div class="member-head">
+      <% if (member.avatar) { %>
+        <img class="mh-avatar" src="<%= member.avatar %>" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.remove();">
+      <% } else { %>
+        <div class="mh-fallback"><%= (member.name || '?').charAt(0).toUpperCase() %></div>
+      <% } %>
+      <div class="mh-info">
+        <h1>
+          <%= member.name %>
+          <% if (member.isSuper) { %><span class="role-super">👑 總管理員</span>
+          <% } else if (member.role === 'admin') { %><span class="role-admin">👑 管理員</span>
+          <% } else { %><span style="color:#5f7285;font-size:14px;font-weight:400;">會員</span><% } %>
+        </h1>
+        <div class="mh-meta">
+          會員 ID：<%= member.id %>
+          ・ <a href="/user/<%= member.id %>" style="color:#1976d2;text-decoration:none;">睇公開檔案 →</a>
+        </div>
+        <% if (member.email) { %>
+          <div class="email-line">📧 <%= member.email %>（只有總管理員睇到）</div>
+        <% } %>
+        <% if (member.banned) { %>
+          <div class="ban-note">🚫 已被封鎖：<%= member.banned.reason %>（由 <%= member.banned.by %> 於 <%= new Date(member.banned.at).toLocaleString('zh-HK') %> 執行）</div>
+        <% } %>
+        <% if (member.role !== 'admin') { %>
+          <div class="mh-meta" style="margin-top:4px;">⭐ 目前分數：<b><%= member.score == null ? '—' : member.score %></b></div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- 統計數字 -->
+    <div class="stat-row">
+      <div class="stat-box"><div class="s-num c-total"><%= stats.total %></div><div class="s-label">📤 總上載</div></div>
+      <div class="stat-box"><div class="s-num c-ok"><%= stats.approved %></div><div class="s-label">✅ 已通過</div></div>
+      <div class="stat-box"><div class="s-num c-wait"><%= stats.pending %></div><div class="s-label">⏳ 待審核</div></div>
+      <div class="stat-box"><div class="s-num c-changes"><%= stats.changes %></div><div class="s-label">✏️ 補充資料中</div></div>
+      <div class="stat-box"><div class="s-num c-bad"><%= stats.rejected %></div><div class="s-label">❌ 已拒絕</div></div>
+      <div class="stat-box"><div class="s-num c-total"><%= stats.rate == null ? '—' : stats.rate + '%' %></div><div class="s-label">📈 通過率</div></div>
+    </div>
+
+    <!-- 相片紀錄 -->
+    <div class="card">
+      <h2>📸 上載紀錄（<%= stats.total %> 張）</h2>
+      <% if (memberPhotos.length === 0) { %>
+        <div class="empty">呢個會員仲未上載過任何相片</div>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>縮圖</th>
+              <th>標題／資料</th>
+              <th>狀態</th>
+              <th>審核員</th>
+              <th>上載時間</th>
+              <th>上訴</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% memberPhotos.forEach(p => { %>
+              <tr>
+                <td><%= p.id %></td>
+                <td>
+                  <a href="/photo/<%= p.id %>">
+                    <img class="thumb" src="<%= p.image_url %>" alt="" loading="lazy">
+                  </a>
+                </td>
+                <td>
+                  <a href="/photo/<%= p.id %>" style="color:#1976d2;text-decoration:none;font-weight:600;"><%= p.title %></a>
+                  <div class="sub-note"><%= p.registration %> ・ <%= p.airline %> ・ <%= p.aircraft_type %></div>
+                  <% if (p.reject_reason) { %>
+                    <div class="sub-note" style="color:#b71c1c;">❌ 拒絕原因：<%= p.reject_reason %></div>
+                  <% } %>
+                  <% if (p.admin_note) { %>
+                    <div class="sub-note" style="color:#1976d2;">✏️ 備註：<%= p.admin_note %></div>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (p.status === 'approved') { %><span class="st st-approved">✅ 已通過</span>
+                  <% } else if (p.status === 'pending') { %><span class="st st-pending">⏳ 待審核</span>
+                  <% } else if (p.status === 'rejected') { %><span class="st st-rejected">❌ 已拒絕</span>
+                  <% } else if (p.status === 'changes_requested') { %><span class="st st-changes">✏️ 補充資料</span><% } %>
+                </td>
+                <td><%= p.reviewed_by || '—' %></td>
+                <td style="white-space:nowrap;"><%= new Date(p.created_at).toLocaleString('zh-HK') %></td>
+                <td><%= (p.appeal_count || 0) > 0 ? '📮 ' + p.appeal_count + ' 次' : '—' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cxhkgcxvhhh Aviation enthusiast Club</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:"Segoe UI","Microsoft JhengHei",sans-serif;
+    background:linear-gradient(160deg,#cfe4f7 0%,#e8f2fb 40%,#ffffff 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    color:#1a2733;
+  }
+
+  /* ===== 全站玻璃風格覆蓋 ===== */
+  .card, .stat-card, .lb-card, .news-card, .panel, .photo-card {
+    background:rgba(255,255,255,0.55) !important;
+    backdrop-filter:blur(14px) !important;
+    -webkit-backdrop-filter:blur(14px) !important;
+    border:1px solid rgba(255,255,255,0.65) !important;
+    border-radius:18px !important;
+    box-shadow:0 8px 28px rgba(30,60,100,0.10) !important;
+  }
+
+  /* ===== 詳細資料頁：上載者 / 審核員卡片更透明 ===== */
+  .person-card, .uploader-card, .reviewer-card, .people-card {
+    background:rgba(255,255,255,0.22) !important;
+    backdrop-filter:blur(20px) !important;
+    -webkit-backdrop-filter:blur(20px) !important;
+    border:1px solid rgba(255,255,255,0.45) !important;
+  }
+
+  .btn, button.btn {
+    background:rgba(255,255,255,0.25) !important;
+    border:1.5px solid rgba(29,155,240,0.65) !important;
+    color:#0f6cb0 !important;
+    border-radius:999px !important;
+    backdrop-filter:blur(8px) !important;
+    transition:all .2s ease !important;
+  }
+  .btn:hover, button.btn:hover {
+    background:rgba(29,155,240,0.12) !important;
+    transform:translateY(-1px) !important;
+  }
+
+  /* ===== 塗裝類型標籤（相卡左上角） ===== */
+  .cat-tag {
+    position:absolute; top:10px; left:10px; z-index:5;
+    padding:4px 11px; border-radius:999px;
+    font-size:12px; font-weight:800; letter-spacing:.3px;
+    color:#ffffff;
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.5);
+    box-shadow:0 2px 10px rgba(0,0,0,0.20);
+    pointer-events:none;
+  }
+  .cat-standard      { background:linear-gradient(135deg,#1d9bf0,#0f6cb0); }
+  .cat-special       { background:linear-gradient(135deg,#a855f7,#ec4899); }
+  .cat-cargo         { background:linear-gradient(135deg,#f59e0b,#d97706); }
+  .cat-cargo-special { background:linear-gradient(135deg,#f59e0b,#a855f7); }
+  .cat-military      { background:linear-gradient(135deg,#3f7a4a,#2c5735); }
+  .cat-private       { background:linear-gradient(135deg,#d4af37,#a8842a); }
+  .cat-heli          { background:linear-gradient(135deg,#0e9aa7,#0b7c86); }
+  .cat-retro         { background:linear-gradient(135deg,#8d6e63,#5d4037); }
+  .cat-airport       { background:linear-gradient(135deg,#5c6bc0,#3949ab); }
+  .cat-terminal      { background:linear-gradient(135deg,#26a69a,#00796b); }
+  .cat-ground        { background:linear-gradient(135deg,#ef6c00,#e65100); }
+
+  /* ===== 上載頁：塗裝類型選擇掣 ===== */
+  .cat-picker { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  @media (min-width:640px) { .cat-picker { grid-template-columns:repeat(4,1fr); } }
+  .cat-picker input { display:none; }
+  .cat-picker label {
+    text-align:center;
+    padding:11px 8px; border-radius:14px; cursor:pointer;
+    font-size:0.88rem; font-weight:700; color:#47617a;
+    background:rgba(255,255,255,0.45);
+    border:1.5px solid rgba(180,200,220,0.6);
+    backdrop-filter:blur(8px);
+    transition:all .18s ease; user-select:none;
+  }
+  .cat-picker label:hover { transform:translateY(-1px); }
+  .cat-picker input:checked + label[data-cat="standard"]      { background:linear-gradient(135deg,#1d9bf0,#0f6cb0); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(29,155,240,0.30); }
+  .cat-picker input:checked + label[data-cat="special"]       { background:linear-gradient(135deg,#a855f7,#ec4899); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(190,80,200,0.30); }
+  .cat-picker input:checked + label[data-cat="cargo"]         { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(220,140,20,0.30); }
+  .cat-picker input:checked + label[data-cat="cargo-special"] { background:linear-gradient(135deg,#f59e0b,#a855f7); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(200,120,80,0.30); }
+  .cat-picker input:checked + label[data-cat="military"]      { background:linear-gradient(135deg,#3f7a4a,#2c5735); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(50,110,60,0.30); }
+  .cat-picker input:checked + label[data-cat="private"]       { background:linear-gradient(135deg,#d4af37,#a8842a); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(190,150,40,0.30); }
+  .cat-picker input:checked + label[data-cat="heli"]          { background:linear-gradient(135deg,#0e9aa7,#0b7c86); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(14,154,167,0.30); }
+  .cat-picker input:checked + label[data-cat="retro"]         { background:linear-gradient(135deg,#8d6e63,#5d4037); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(110,80,60,0.30); }
+
+  /* ===== 📢 登入公告彈窗（超透明玻璃） ===== */
+  .ann-overlay {
+    position:fixed; inset:0; z-index:4000;
+    background:rgba(200,220,240,0.25);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .ann-modal {
+    max-width:560px; width:100%; max-height:78vh; overflow-y:auto;
+    background:rgba(255,255,255,0.28);
+    backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
+    border:1.5px solid rgba(255,255,255,0.55);
+    border-radius:22px; padding:30px 32px;
+    box-shadow:0 24px 70px rgba(30,60,100,0.22);
+    text-align:center;
+  }
+  .ann-modal .ann-icon { font-size:44px; margin-bottom:6px; }
+  .ann-modal h2 { font-size:22px; color:#0d2137; margin-bottom:4px; }
+  .ann-modal .ann-sub { font-size:12px; color:#47617a; margin-bottom:18px; }
+  .ann-item {
+    text-align:left;
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(255,255,255,0.55);
+    border-radius:14px; padding:14px 18px; margin-bottom:12px;
+  }
+  .ann-item .ann-t { font-size:15px; font-weight:800; color:#0d2137; margin-bottom:4px; }
+  .ann-item .ann-c { font-size:13.5px; color:#33475c; line-height:1.8; white-space:pre-wrap; }
+  .ann-item .ann-m { font-size:11px; color:#5f7285; margin-top:8px; }
+  .ann-ok {
+    margin-top:10px; padding:12px 34px; cursor:pointer;
+    font-family:inherit; font-size:15px; font-weight:800; color:#0f6cb0;
+    background:rgba(255,255,255,0.18);
+    border:2px solid rgba(29,155,240,0.75); border-radius:999px;
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    transition:all .2s ease;
+  }
+  .ann-ok:hover { background:rgba(29,155,240,0.15); transform:translateY(-1px); }
+
+  /* ===== 📋 審圖標準按鈕＋彈窗 ===== */
+  .rs-banner { margin:0 0 20px; }
+  .rs-btn {
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; padding:15px 20px; cursor:pointer;
+    font-family:inherit; font-size:16px; font-weight:800; color:#8a6d00;
+    background:linear-gradient(135deg,rgba(255,243,205,0.90),rgba(255,232,160,0.80));
+    border:1.5px solid rgba(235,190,90,0.85);
+    border-radius:16px;
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 4px 16px rgba(180,140,40,0.14);
+    transition:all .2s ease;
+  }
+  .rs-btn:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(180,140,40,0.22); }
+  .rs-overlay {
+    position:fixed; inset:0; z-index:3000;
+    background:rgba(20,40,60,0.45);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .rs-overlay.open { display:flex; }
+  .rs-modal {
+    max-width:640px; width:100%; max-height:82vh; overflow-y:auto;
+    background:rgba(255,255,255,0.97);
+    border:1px solid rgba(255,255,255,0.8);
+    border-radius:20px; padding:30px 34px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.28);
+    line-height:1.9; color:#34495e; font-size:14.5px;
+  }
+  .rs-modal h2 { font-size:22px; margin-bottom:4px; color:#1a2733; }
+  .rs-modal .rs-sub { font-size:13px; color:#7a8ca0; margin-bottom:14px; }
+  .rs-modal h3 { font-size:16px; color:#0f6cb0; margin:20px 0 8px; }
+  .rs-modal ol { padding-left:22px; margin:0; }
+  .rs-modal li { margin-bottom:7px; }
+  .rs-close {
+    margin-top:24px; width:100%; padding:12px;
+    font-family:inherit; font-size:15px; font-weight:800; color:#0f6cb0;
+    background:rgba(255,255,255,0.25);
+    border:1.5px solid rgba(29,155,240,0.65);
+    border-radius:999px; cursor:pointer;
+    transition:all .2s ease;
+  }
+  .rs-close:hover { background:rgba(29,155,240,0.12); }
+
+  /* ===== 🚫 封鎖提示橫額 ===== */
+  .ban-banner {
+    background:linear-gradient(135deg,#c62828,#b71c1c);
+    color:#fff; padding:12px 20px;
+    font-size:14px; font-weight:600;
+    text-align:center; line-height:1.7;
+    box-shadow:0 4px 14px rgba(198,40,40,0.30);
+  }
+  .ban-banner a { color:#ffe082; }
+
+  /* ===== 頂欄 ===== */
+  .topbar {
+    position:sticky; top:0; z-index:1000;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 26px;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(28px);
+    -webkit-backdrop-filter:blur(28px);
+    border-bottom:1px solid rgba(255,255,255,0.35);
+  }
+  .brand {
+    display:flex; align-items:center; gap:12px;
+    text-decoration:none; color:inherit;
+  }
+  .brand img {
+    height:46px; width:auto; display:block;
+    object-fit:contain;
+  }
+  .nav { display:flex; align-items:center; gap:20px; }
+  .nav a {
+    color:#1a2733; text-decoration:none;
+    font-size:15px; font-weight:600;
+    padding:6px 4px; border-bottom:2px solid transparent;
+    transition:border-color .2s ease;
+  }
+  .nav a:hover { border-bottom-color:#1d9bf0; }
+
+  /* ===== 帳號區 ===== */
+  .account { position:relative; display:flex; align-items:center; }
+  .account-chip {
+    display:flex; align-items:center; gap:8px;
+    padding:5px 14px 5px 6px;
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(255,255,255,0.6);
+    border-radius:999px;
+    cursor:pointer; user-select:none;
+    backdrop-filter:blur(10px);
+    transition:background .2s ease;
+  }
+  .account-chip:hover { background:rgba(255,255,255,0.55); }
+  .account-chip img.avatar {
+    width:30px; height:30px; border-radius:50%; object-fit:cover;
+  }
+  .account-chip .avatar-fallback {
+    width:30px; height:30px; border-radius:50%;
+    background:#1d9bf0; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:700;
+  }
+  .account-chip .acc-name {
+    font-size:14px; font-weight:700;
+    display:flex; align-items:center; gap:5px;
+  }
+  .account-chip svg.badge { flex:0 0 auto; overflow:visible; }
+
+  .dropdown {
+    position:absolute; right:0; top:calc(100% + 10px);
+    min-width:190px;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.7);
+    border-radius:14px;
+    box-shadow:0 12px 34px rgba(30,60,100,0.18);
+    padding:8px;
+    opacity:0; visibility:hidden;
+    transform:translateY(8px);
+    transition:opacity .25s ease, transform .25s ease, visibility .25s;
+    pointer-events:none;
+  }
+  .account:hover .dropdown, .dropdown.show {
+    opacity:1; visibility:visible;
+    transform:translateY(0);
+    pointer-events:auto;
+  }
+  .dropdown a {
+    display:flex; align-items:center; gap:9px;
+    padding:10px 12px;
+    color:#1a2733; text-decoration:none;
+    font-size:14px; font-weight:600;
+    border-radius:10px;
+    transition:background .15s ease;
+  }
+  .dropdown a:hover { background:rgba(29,155,240,0.10); }
+
+  .login-btn {
+    padding:8px 20px; font-size:14px; font-weight:700;
+    text-decoration:none;
+    background:rgba(255,255,255,0.25);
+    border:1.5px solid rgba(29,155,240,0.65);
+    color:#0f6cb0; border-radius:999px;
+    backdrop-filter:blur(8px);
+    transition:all .2s ease;
+  }
+  .login-btn:hover { background:rgba(29,155,240,0.12); }
+
+  .container { max-width:1200px; margin:0 auto; padding:26px 20px 60px; }
+
+  /* ===== 頁尾 ===== */
+  .site-footer {
+    text-align:center;
+    padding:28px 16px 34px;
+    font-size:13px; color:#5a7086;
+  }
+  .site-footer .f-links { margin-top:8px; }
+  .site-footer a { color:#0f6cb0; text-decoration:none; margin:0 8px; }
+  .site-footer a:hover { text-decoration:underline; }
+
+  @media (max-width:860px) {
+    .nav { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<%
+  function hdrBadge(u, size) {
+    if (!u || u.role !== 'admin') return '';
+    size = size || 16;
+    var color = u.isSuper ? '#f5b800' : '#1d9bf0';
+    return '<svg class="badge" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" style="overflow:visible">'
+      + '<path fill="' + color + '" d="M12 0l2.5 2.4 3.4-.5 1.1 3.1 3.1 1.1-.5 3.4L24 12l-2.4 2.5.5 3.4-3.1 1.1-1.1 3.1-3.4-.5L12 24l-2.5-2.4-3.4.5-1.1-3.1-3.1-1.1.5-3.4L0 12l2.4-2.5-.5-3.4 3.1-1.1 1.1-3.1 3.4.5z"/>'
+      + '<path fill="#fff" d="M10.7 15.9l-3.2-3.2 1.4-1.4 1.8 1.8 4.6-4.6 1.4 1.4z"/>'
+      + '</svg>';
+  }
+%>
+
+<header class="topbar">
+  <a class="brand" href="/">
+    <img src="/logo.png" alt="cxhkgcxvhhh Aviation enthusiast Club">
+  </a>
+
+  <nav class="nav">
+    <a href="/">首頁</a>
+    <a href="/gallery">圖鑑</a>
+    <a href="/photographers">攝影師</a>
+    <a href="/news">新聞</a>
+    <a href="/contact">聯絡我哋</a>
+    <% if (user) { %>
+      <a href="/upload">上載相片</a>
+      <% if (user.role === 'admin') { %><a href="/admin">管理後台</a><% } %>
+    <% } %>
+  </nav>
+
+  <% if (user) { %>
+    <div class="account" id="accountBox">
+      <div class="account-chip" id="accountChip">
+        <% if (user.avatar) { %>
+          <img class="avatar" src="<%= user.avatar %>" alt="">
+        <% } else { %>
+          <div class="avatar-fallback"><%= (user.name || '?').charAt(0).toUpperCase() %></div>
+        <% } %>
+        <span class="acc-name">
+          <%= user.name %>
+          <%- hdrBadge(user, 16) %>
+          <span id="hdrTierBadge"></span>
+        </span>
+      </div>
+      <div class="dropdown" id="accountDropdown">
+        <a href="/profile">👤 個人檔案</a>
+        <a href="/upload">📤 上載相片</a>
+        <a href="/score-history">📜 分數紀錄</a>
+        <% if (user.role === 'admin') { %>
+          <a href="/admin">🛠️ 管理後台</a>
+          <a href="/admin/users">👥 會員管理</a>
+          <a href="/admin/logins">🔐 登入紀錄</a>
+        <% } %>
+        <a href="/logout">🚪 登出</a>
+      </div>
+    </div>
+  <% } else { %>
+    <a class="login-btn" href="/login">登入</a>
+  <% } %>
+</header>
+
+<main class="container">
+
+<% if (typeof showAnnPopup !== 'undefined' && showAnnPopup && typeof announcements !== 'undefined' && announcements.length > 0) { %>
+<div class="ann-overlay" id="annOverlay">
+  <div class="ann-modal">
+    <div class="ann-icon">📢</div>
+    <h2>站方公告</h2>
+    <div class="ann-sub">cxhkgcxvhhh Aviation enthusiast Club — 請留意以下最新通告</div>
+    <% announcements.forEach(function(a) { %>
+      <div class="ann-item">
+        <div class="ann-t"><%= a.title %></div>
+        <div class="ann-c"><%= a.content %></div>
+        <div class="ann-m">由 <%= a.created_by %> 於 <%= new Date(a.created_at).toLocaleString('zh-HK') %> 發佈</div>
+      </div>
+    <% }); %>
+    <button type="button" class="ann-ok" id="annOkBtn">已知道此通告</button>
+  </div>
+</div>
+<script>
+  document.getElementById('annOkBtn').addEventListener('click', function () {
+    document.getElementById('annOverlay').style.display = 'none';
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      var annO = document.getElementById('annOverlay');
+      if (annO) annO.style.display = 'none';
+    }
+  });
+</script>
+<% } %>
+
+<script>
+(function () {
+  var chip = document.getElementById('accountChip');
+  var dd = document.getElementById('accountDropdown');
+  if (chip && dd) {
+    chip.addEventListener('click', function (e) {
+      e.stopPropagation();
+      dd.classList.toggle('show');
+    });
+    document.addEventListener('click', function () {
+      dd.classList.remove('show');
+    });
+  }
+
+  function badgeSvg(kind, size) {
+    var star = 'M12 0l2.5 2.4 3.4-.5 1.1 3.1 3.1 1.1-.5 3.4L24 12l-2.4 2.5.5 3.4-3.1 1.1-1.1 3.1-3.4-.5L12 24l-2.5-2.4-3.4.5-1.1-3.1-3.1-1.1.5-3.4L0 12l2.4-2.5-.5-3.4 3.1-1.1 1.1-3.1 3.4.5z';
+    var check = '<path fill="#fff" d="M10.7 15.9l-3.2-3.2 1.4-1.4 1.8 1.8 4.6-4.6 1.4 1.4z"/>';
+    if (kind === 'rainbow') {
+      return '<svg class="badge" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" style="overflow:visible">'
+        + '<defs><linearGradient id="hdrRb" x1="0" y1="0" x2="1" y2="1">'
+        + '<stop offset="0%" stop-color="#ff004c"><animate attributeName="stop-color" values="#ff004c;#ff8a00;#ffee00;#2fd65a;#2f9bff;#b04cff;#ff004c" dur="3s" repeatCount="indefinite"/></stop>'
+        + '<stop offset="100%" stop-color="#2f9bff"><animate attributeName="stop-color" values="#2f9bff;#b04cff;#ff004c;#ff8a00;#ffee00;#2fd65a;#2f9bff" dur="3s" repeatCount="indefinite"/></stop>'
+        + '</linearGradient></defs>'
+        + '<path fill="url(#hdrRb)" d="' + star + '"/>' + check + '</svg>';
+    }
+    var fill = kind === 'red' ? '#e0245e' : 'url(#hdrBp)';
+    var defs = kind === 'bluepurple'
+      ? '<defs><linearGradient id="hdrBp" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1d9bf0"/><stop offset="100%" stop-color="#8b3dff"/></linearGradient></defs>'
+      : '';
+    return '<svg class="badge" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" style="overflow:visible">'
+      + defs + '<path fill="' + fill + '" d="' + star + '"/>' + check + '</svg>';
+  }
+
+  <% if (user && user.role !== 'admin') { %>
+  fetch('/api/user/<%= user.id %>/public')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d) return;
+      var score = d.score || 0;
+      var holder = document.getElementById('hdrTierBadge');
+      if (!holder) return;
+      if (score >= 1000)      holder.innerHTML = badgeSvg('rainbow', 16);
+      else if (score >= 50)   holder.innerHTML = badgeSvg('bluepurple', 16);
+      else if (score >= 30)   holder.innerHTML = badgeSvg('red', 16);
+    })
+    .catch(function () {});
+  <% } %>
+
+  // ============================================
+  // 🏷️ 塗裝類型標籤：自動貼喺所有相片卡左上角
+  // ============================================
+  var CAT_LABELS = {
+    'standard':      { text: '普通塗裝', cls: 'cat-standard' },
+    'special':       { text: '彩繪',     cls: 'cat-special' },
+    'cargo':         { text: '貨機',     cls: 'cat-cargo' },
+    'cargo-special': { text: '貨機彩繪', cls: 'cat-cargo-special' },
+    'military':      { text: '軍機',     cls: 'cat-military' },
+    'private':       { text: '私人飛機', cls: 'cat-private' },
+    'heli':          { text: '直升機',   cls: 'cat-heli' },
+    'retro':         { text: '復古塗裝', cls: 'cat-retro' },
+    'airport':       { text: '機場',     cls: 'cat-airport' },
+    'terminal':      { text: '客運大樓', cls: 'cat-terminal' },
+    'ground':        { text: '地勤',     cls: 'cat-ground' }
+  };
+  var catByFile = {};
+
+  function tagAllCards() {
+    var links = document.querySelectorAll('a[href^="/photo/"]');
+    links.forEach(function (a) {
+      if (a.querySelector('.cat-tag')) return;
+      var img = a.querySelector('img[src*="/uploads/"]');
+      if (!img) return;
+      var file = img.getAttribute('src').split('/').pop();
+      var cat = catByFile[file];
+      if (!cat || !CAT_LABELS[cat]) return;
+      var cs = window.getComputedStyle(a);
+      if (cs.position === 'static') a.style.position = 'relative';
+      var tag = document.createElement('span');
+      tag.className = 'cat-tag ' + CAT_LABELS[cat].cls;
+      tag.textContent = CAT_LABELS[cat].text;
+      a.appendChild(tag);
+    });
+  }
+
+  fetch('/api/photos')
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (list) {
+      list.forEach(function (p) {
+        if (p.image_url && p.category) catByFile[p.image_url.split('/').pop()] = p.category;
+      });
+      tagAllCards();
+      // 有啲頁面係之後先 render 卡片，留意住 DOM 變化
+      var mo = new MutationObserver(function () { tagAllCards(); });
+      mo.observe(document.body, { childList: true, subtree: true });
+    })
+    .catch(function () {});
+
+  // ============================================
+  // 🎛️ 上載頁：自動加入塗裝類型選擇掣
+  // ============================================
+  document.addEventListener('DOMContentLoaded', function () {
+    var form = document.querySelector('form[action="/upload"]');
+    if (form && !form.querySelector('.cat-picker')) {
+      var cats = [
+        ['standard',      '🛩️ 普通塗裝'],
+        ['special',       '🎨 彩繪'],
+        ['cargo',         '📦 貨機'],
+        ['cargo-special', '🎨📦 貨機彩繪'],
+        ['military',      '🪖 軍機'],
+        ['private',       '🛫 私人飛機'],
+        ['heli',          '🚁 直升機'],
+        ['retro',         '📼 復古塗裝']
+      ];
+      var html = '<label class="form-label">塗裝類型 <span>— 會顯示喺相片左上角</span></label><div class="cat-picker">';
+      cats.forEach(function (c, i) {
+        html += '<input type="radio" name="category" id="catPick' + i + '" value="' + c[0] + '"' + (i === 0 ? ' checked' : '') + '>'
+              + '<label for="catPick' + i + '" data-cat="' + c[0] + '">' + c[1] + '</label>';
+      });
+      html += '</div>';
+      var wrap = document.createElement('div');
+      wrap.className = 'form-group';
+      wrap.innerHTML = html;
+      // 擺喺「塗裝」欄後面；搵唔到就擺喺提交掣前面
+      var liveryInput = form.querySelector('input[name="livery"]');
+      var liveryGroup = liveryInput ? liveryInput.closest('.form-group') : null;
+      if (liveryGroup && liveryGroup.nextSibling) {
+        liveryGroup.parentNode.insertBefore(wrap, liveryGroup.nextSibling);
+      } else {
+        var submitBtn = form.querySelector('button[type="submit"], .submit-btn');
+        form.insertBefore(wrap, submitBtn || null);
+      }
+    }
+  });
+
+  // ============================================
+  // 📋 上載頁：審圖標準按鈕＋彈窗
+  // ============================================
+  document.addEventListener('DOMContentLoaded', function () {
+    var upForm = document.querySelector('form[action="/upload"]');
+    if (!upForm || document.getElementById('rsBanner')) return;
+
+    // 顯眼嘅黃色玻璃按鈕，擺喺上載表格正上方
+    var banner = document.createElement('div');
+    banner.className = 'rs-banner';
+    banner.id = 'rsBanner';
+    banner.innerHTML = '<button type="button" class="rs-btn" id="rsOpenBtn">📋 審圖標準 — 上載前請先睇一睇</button>';
+    upForm.parentNode.insertBefore(banner, upForm);
+
+    // 彈窗內容
+    var overlay = document.createElement('div');
+    overlay.className = 'rs-overlay';
+    overlay.id = 'rsOverlay';
+    overlay.innerHTML =
+      '<div class="rs-modal">' +
+        '<h2>📋 審圖標準</h2>' +
+        '<div class="rs-sub">cxhkgcxvhhh Aviation enthusiast Club — 所有相片都會由管理員逐張親自審核</div>' +
+
+        '<h3>一、相片質素</h3>' +
+        '<ol>' +
+          '<li>主體（飛機）必須清晰對焦，嚴重模糊、手震、有明顯雜訊嘅相片會被拒絕。</li>' +
+          '<li>曝光要適中，過暗、死白過曝嘅相片會被拒絕。</li>' +
+          '<li>飛機必須係畫面主體，太遠、太細、被遮擋超過一半嘅相片會被拒絕。</li>' +
+        '</ol>' +
+
+        '<h3>二、構圖</h3>' +
+        '<ol start="4">' +
+          '<li>可以接受合理裁切，但切走機頭、機尾或機翼大部分嘅構圖，除非有特別藝術效果，否則會被拒絕。</li>' +
+          '<li>相片唔可以有明顯傾斜（地平線歪斜）。</li>' +
+        '</ol>' +
+
+        '<h3>三、後期處理</h3>' +
+        '<ol start="6">' +
+          '<li>可以加上自己嘅水印或簽名，但必須細小、低調、放喺角落，唔可以遮住主體；太大、太搶眼、放正中央嘅水印會被拒絕。</li>' +
+          '<li>嚴禁合成、改圖（例如 P 走障礙物、換天空）。</li>' +
+        '</ol>' +
+
+        '<h3>四、內容規則</h3>' +
+        '<ol start="8">' +
+          '<li>只接受航空相關相片（飛機、直升機、機場相關題材）。</li>' +
+          '<li>嚴禁上載他人作品，偷圖一經證實即時封鎖帳號。</li>' +
+          '<li>相片內容不得包含不雅、政治、廣告或冒犯性內容。</li>' +
+        '</ol>' +
+
+        '<h3>五、資料填寫</h3>' +
+        '<ol start="11">' +
+          '<li>註冊編號、航空公司、機型、拍攝日期、地點必須如實填寫，亂填會被拒絕。</li>' +
+          '<li>如果資料有少許錯漏，審核員會用「要求補充資料」俾你改，呢個唔會扣分。</li>' +
+        '</ol>' +
+
+        '<h3>六、審核制度</h3>' +
+        '<ol start="13">' +
+          '<li>每張相片都會由管理員逐張親自審核。</li>' +
+          '<li>通過 +1 分，拒絕 −1 分，「要求補充資料」唔會扣分。</li>' +
+          '<li>被拒絕嘅相片只有你自己同管理員睇到。</li>' +
+          '<li>如果你唔同意審核結果，可以喺個人檔案撳「上訴」，或者電郵 cxcvaec@gmail.com。</li>' +
+        '</ol>' +
+
+        '<button type="button" class="rs-close" id="rsCloseBtn">明白晒，關閉 ✈️</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    // 開關邏輯
+    document.getElementById('rsOpenBtn').addEventListener('click', function () {
+      overlay.classList.add('open');
+    });
+    document.getElementById('rsCloseBtn').addEventListener('click', function () {
+      overlay.classList.remove('open');
+    });
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') overlay.classList.remove('open');
+    });
+  });
+
+  // ============================================
+  // 🚫 封鎖提示：被封用戶喺每頁頂部見到紅色橫額
+  // ============================================
+  <% if (user) { %>
+  fetch('/api/my-ban-status')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d.banned) return;
+      var b = document.createElement('div');
+      b.className = 'ban-banner';
+      b.innerHTML = '🚫 你嘅帳號已被封鎖，暫時唔可以上載相片。原因：' + d.reason +
+        '（由 ' + d.by + ' 執行）— 如有疑問請電郵 <a href="mailto:cxcvaec@gmail.com">cxcvaec@gmail.com</a>';
+      document.body.insertBefore(b, document.body.firstChild);
+    })
+    .catch(function () {});
+  <% } %>
+
+  // ===== 頁尾注入 =====
+  document.addEventListener('DOMContentLoaded', function () {
+    if (document.querySelector('.site-footer')) return;
+    var f = document.createElement('footer');
+    f.className = 'site-footer';
+    f.innerHTML = 'cxhkgcxvhhh, cxhkgcxvhhh Aviation enthusiast Club, cxhkgcxvhhh Aviation enthusiast Club 圖庫, cxcvaec © 2026'
+      + '<div class="f-links"><a href="/privacy">私隱政策</a>·<a href="/contact">聯絡我哋</a></div>';
+    document.body.appendChild(f);
+  });
+})();
+</script>

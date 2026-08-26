@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登入紀錄 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft JhengHei', 'PingFang HK', Arial, sans-serif; background: #f4f8fc; color: #1a2b3c; }
+    .wrap { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .page-head h1 { font-size: 22px; color: #0d2137; }
+    .back-link { font-size: 13px; color: #1976d2; text-decoration: none; font-weight: 700; }
+    .back-link:hover { text-decoration: underline; }
+    .card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 8px 30px rgba(25,60,100,0.10); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; color: #5f7285; font-size: 12px; border-bottom: 2px solid #e3ecf5; white-space: nowrap; }
+    td { padding: 10px 12px; border-bottom: 1px solid #eef3f8; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .time { color: #8ba0b3; font-size: 12px; white-space: nowrap; }
+    .uname { font-weight: 700; color: #1a2b3c; }
+    .uname a { color: #1976d2; text-decoration: none; }
+    .email { color: #5f7285; font-size: 12px; }
+    .role-super { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: #fff8e1; color: #b8860b; border: 1px solid #f0d878; }
+    .role-admin { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+    .role-member { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #f4f8fc; color: #5f7285; border: 1px solid #dde7f0; }
+    .empty { color: #8ba0b3; font-size: 13px; padding: 20px 0; text-align: center; }
+    .note { font-size: 12px; color: #8ba0b3; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="wrap">
+    <div class="page-head">
+      <h1>🔐 登入紀錄</h1>
+      <a class="back-link" href="/admin">← 返回管理後台</a>
+    </div>
+
+    <div class="card">
+      <% if (records.length === 0) { %>
+        <div class="empty">暫時未有登入紀錄</div>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>用戶</th>
+              <% if (user.isSuper) { %><th>📧 電郵</th><% } %>
+              <th>身份</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% records.forEach(r => { %>
+              <tr>
+                <td class="time"><%= new Date(r.at).toLocaleString('zh-HK') %></td>
+                <td class="uname"><a href="/user/<%= r.user_id %>"><%= r.name %></a></td>
+                <% if (user.isSuper) { %><td class="email"><%= r.email %></td><% } %>
+                <td>
+                  <% if (r.isSuper) { %>
+                    <span class="role-super">👑 總管理員</span>
+                  <% } else if (r.role === 'admin') { %>
+                    <span class="role-admin">👑 管理員</span>
+                  <% } else { %>
+                    <span class="role-member">會員</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+      <p class="note">💡 最多保留最近 1000 次登入紀錄。<% if (user.isSuper) { %>只有總管理員可以睇到電郵地址。<% } else { %>電郵地址只有總管理員先睇到。<% } %></p>
+    </div>
+  </div>
+</body>
+</html>

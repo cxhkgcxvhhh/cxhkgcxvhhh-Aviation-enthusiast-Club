@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>圖鑑 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft JhengHei', 'PingFang HK', Arial, sans-serif; background: #f4f8fc; color: #1a2b3c; }
+    .wrap { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    h1 { font-size: 28px; margin-bottom: 20px; color: #0d2137; }
+    .filters { background: rgba(255,255,255,0.2); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); border-radius: 18px; padding: 20px; box-shadow: 0 6px 24px rgba(25,60,100,0.08); margin-bottom: 16px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 14px; align-items: center; }
+    .filters input { width: 100%; padding: 10px 14px; border: 1.5px solid rgba(255,255,255,0.5); border-radius: 12px; font-size: 14px; font-family: inherit; background: rgba(255,255,255,0.3); }
+    .filters input:focus { outline: none; border-color: #1976d2; }
+    .cat-btn { padding: 10px 22px; border-radius: 999px; border: 1.5px solid rgba(25,118,210,0.5); background: rgba(25,118,210,0.12); color: #1565c0; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .cat-btn:hover, .cat-btn.active { background: rgba(25,118,210,0.25); }
+
+    /* 分類面板 */
+    .cat-panel { display: none; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; padding: 20px 22px; margin-bottom: 24px; }
+    .cat-panel.show { display: block; animation: fadeSlide 0.3s ease; }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .cat-group { margin-bottom: 16px; }
+    .cat-group:last-child { margin-bottom: 0; }
+    .cat-group .cg-title { font-size: 13px; font-weight: 800; color: #41576b; margin-bottom: 10px; }
+    .cat-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { padding: 7px 16px; border-radius: 999px; border: 1.5px solid rgba(13,33,55,0.2); background: rgba(255,255,255,0.3); font-size: 13px; font-weight: 600; color: #0d2137; cursor: pointer; transition: all 0.15s; }
+    .chip:hover { background: rgba(25,118,210,0.18); border-color: rgba(25,118,210,0.5); transform: translateY(-2px); }
+    .chip.active { background: #1976d2; color: #fff; border-color: #1976d2; }
+    .chip .cnt { font-size: 11px; opacity: 0.7; margin-left: 4px; }
+    .clear-cat { padding: 7px 16px; border-radius: 999px; border: 1.5px solid rgba(198,40,40,0.4); background: rgba(198,40,40,0.08); font-size: 13px; font-weight: 600; color: #c62828; cursor: pointer; }
+    .clear-cat:hover { background: rgba(198,40,40,0.18); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .p-card { display: block; background: rgba(255,255,255,0.2); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); border-radius: 18px; overflow: hidden; box-shadow: 0 6px 24px rgba(25,60,100,0.08); text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s; }
+    .p-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(25,60,100,0.16); }
+    .p-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .p-info { padding: 14px 16px; }
+    .p-title { font-size: 15px; font-weight: 700; color: #0d2137; margin-bottom: 4px; }
+    .p-sub { font-size: 12px; color: #5f7285; }
+    .empty { text-align: center; padding: 60px 20px; color: #5f7285; font-size: 15px; }
+    .now-filter { font-size: 13px; color: #1565c0; font-weight: 700; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="wrap">
+    <h1>📚 圖鑑</h1>
+
+    <div class="filters">
+      <input type="text" id="fReg" placeholder="✈️ 註冊號（例如 B-HNL）">
+      <input type="text" id="fAirline" placeholder="🏢 航空公司">
+      <input type="text" id="fType" list="typeList" placeholder="🛩️ 機型">
+      <datalist id="typeList">
+        <% types.forEach(t => { %><option value="<%= t %>"><% }) %>
+      </datalist>
+      <input type="text" id="fLivery" list="liveryList" placeholder="🎨 塗裝">
+      <datalist id="liveryList">
+        <% liveries.forEach(l => { %><option value="<%= l %>"><% }) %>
+      </datalist>
+      <button class="cat-btn" id="catBtn">🗂️ 分類</button>
+    </div>
+
+    <div class="cat-panel" id="catPanel">
+      <div class="cat-group">
+        <div class="cg-title">🏷️ 按分類</div>
+        <div class="cat-chips" id="catChips"></div>
+      </div>
+      <div class="cat-group">
+        <div class="cg-title">🛩️ 按機型</div>
+        <div class="cat-chips" id="typeChips"></div>
+      </div>
+      <div class="cat-group">
+        <div class="cg-title">🏢 按航空公司</div>
+        <div class="cat-chips" id="airlineChips"></div>
+      </div>
+      <div class="cat-group" style="margin-top:14px;">
+        <button class="clear-cat" id="clearCat">✖ 清除分類</button>
+      </div>
+    </div>
+
+    <div class="now-filter" id="nowFilter" style="display:none;"></div>
+    <div class="grid" id="photoGrid"></div>
+    <div class="empty" id="emptyMsg" style="display:none;">搵唔到符合條件嘅相片 😢</div>
+  </div>
+
+  <script>
+    var allPhotos = [];
+    var grid = document.getElementById('photoGrid');
+    var emptyMsg = document.getElementById('emptyMsg');
+    var nowFilter = document.getElementById('nowFilter');
+    var activeCat = null; // { kind: 'type' | 'airline' | 'category', value: '...' }
+    var CATS = [
+      ['standard', '🛩️ 普通塗裝'], ['special', '🎨 彩繪'], ['cargo', '📦 貨機'],
+      ['cargo-special', '🎨📦 貨機彩繪'], ['military', '🪖 軍機'], ['private', '🛫 私人飛機'],
+      ['heli', '🚁 直升機'], ['retro', '📼 復古塗裝'],
+      ['airport', '🛫 機場'], ['terminal', '🏢 客運大樓'], ['ground', '🧑‍🔧 地勤']
+    ];
+
+    function esc(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function render(list) {
+      if (list.length === 0) {
+        grid.innerHTML = '';
+        emptyMsg.style.display = 'block';
+        return;
+      }
+      emptyMsg.style.display = 'none';
+      grid.innerHTML = list.map(function (p) {
+        return '<a class="p-card" href="/photo/' + p.id + '">' +
+          '<img src="' + esc(p.image_url) + '" alt="' + esc(p.title) + '" loading="lazy">' +
+          '<div class="p-info">' +
+            '<div class="p-title">' + esc(p.title) + '</div>' +
+            '<div class="p-sub">' + esc(p.registration) + ' · ' + esc(p.airline) + '</div>' +
+            '<div class="p-sub">📸 ' + esc(p.user_name) + '</div>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    }
+
+    function applyFilters() {
+      var reg = document.getElementById('fReg').value.trim().toLowerCase();
+      var airline = document.getElementById('fAirline').value.trim().toLowerCase();
+      var type = document.getElementById('fType').value.trim().toLowerCase();
+      var livery = document.getElementById('fLivery').value.trim().toLowerCase();
+      var list = allPhotos.filter(function (p) {
+        if (reg && (p.registration || '').toLowerCase().indexOf(reg) === -1) return false;
+        if (airline && (p.airline || '').toLowerCase().indexOf(airline) === -1) return false;
+        if (type && (p.aircraft_type || '').toLowerCase().indexOf(type) === -1) return false;
+        if (livery && (p.livery || '').toLowerCase().indexOf(livery) === -1) return false;
+        if (activeCat) {
+          if (activeCat.kind === 'type' && (p.aircraft_type || '') !== activeCat.value) return false;
+          if (activeCat.kind === 'airline' && (p.airline || '') !== activeCat.value) return false;
+          if (activeCat.kind === 'category' && (p.category || 'standard') !== activeCat.value) return false;
+        }
+        return true;
+      });
+      if (activeCat) {
+        nowFilter.style.display = 'block';
+        var catName = activeCat.value;
+        if (activeCat.kind === 'category') {
+          var found = CATS.filter(function (c) { return c[0] === activeCat.value; });
+          catName = found.length ? found[0][1] : activeCat.value;
+        }
+        nowFilter.textContent = '而家顯示緊：' + (activeCat.kind === 'type' ? '🛩️ ' : (activeCat.kind === 'airline' ? '🏢 ' : '')) + catName + '（共 ' + list.length + ' 張）';
+      } else {
+        nowFilter.style.display = 'none';
+      }
+      render(list);
+    }
+
+    // 🗂️ 分類面板開關
+    var catBtn = document.getElementById('catBtn');
+    var catPanel = document.getElementById('catPanel');
+    catBtn.addEventListener('click', function () {
+      catPanel.classList.toggle('show');
+      catBtn.classList.toggle('active');
+    });
+
+    // 由相片資料即場整理機型同航空公司
+    function buildChips() {
+      var typeMap = {}, airlineMap = {};
+      allPhotos.forEach(function (p) {
+        if (p.aircraft_type) typeMap[p.aircraft_type] = (typeMap[p.aircraft_type] || 0) + 1;
+        if (p.airline) airlineMap[p.airline] = (airlineMap[p.airline] || 0) + 1;
+      });
+
+      function makeChips(map, kind, containerId) {
+        var arr = Object.keys(map).sort(function (a, b) { return map[b] - map[a]; });
+        var html = arr.map(function (name) {
+          return '<button class="chip" data-kind="' + kind + '" data-value="' + esc(name) + '">' + esc(name) + '<span class="cnt">' + map[name] + '</span></button>';
+        }).join('');
+        document.getElementById(containerId).innerHTML = html || '<span style="font-size:12px;color:#8ba0b3;">暫時未有資料</span>';
+      }
+
+      makeChips(typeMap, 'type', 'typeChips');
+      makeChips(airlineMap, 'airline', 'airlineChips');
+
+      // 🏷️ 分類 chips（計返每類幾多張）
+      var catMap = {};
+      allPhotos.forEach(function (p) { var c = p.category || 'standard'; catMap[c] = (catMap[c] || 0) + 1; });
+      document.getElementById('catChips').innerHTML = CATS.map(function (c) {
+        var cnt = catMap[c[0]] || 0;
+        if (cnt === 0) return '';
+        return '<button class="chip" data-kind="category" data-value="' + c[0] + '">' + c[1] + '<span class="cnt">' + cnt + '</span></button>';
+      }).join('');
+
+      document.querySelectorAll('.chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var kind = chip.getAttribute('data-kind');
+          var value = chip.getAttribute('data-value');
+          if (activeCat && activeCat.kind === kind && activeCat.value === value) {
+            activeCat = null; // 再撳一次取消
+          } else {
+            activeCat = { kind: kind, value: value };
+          }
+          document.querySelectorAll('.chip').forEach(function (c) {
+            c.classList.toggle('active',
+              activeCat && c.getAttribute('data-kind') === activeCat.kind && c.getAttribute('data-value') === activeCat.value);
+          });
+          applyFilters();
+        });
+      });
+    }
+
+    document.getElementById('clearCat').addEventListener('click', function () {
+      activeCat = null;
+      document.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('active'); });
+      applyFilters();
+    });
+
+    ['fReg', 'fAirline', 'fType', 'fLivery'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', applyFilters);
+    });
+
+    fetch('/api/photos')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        allPhotos = data.sort(function (a, b) { return b.id - a.id; });
+        buildChips();
+        render(allPhotos);
+      });
+  </script>
+</body>

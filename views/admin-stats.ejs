@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>統計儀表板 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    body { background: #f4f8fd; }
+    .stats-wrap { max-width: 1100px; margin: 32px auto; padding: 0 16px; }
+    .page-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+    .page-head h1 { margin: 0; font-size: 26px; color: #1a3a5c; }
+    .back-link { background: transparent; border: 2px solid #1976d2; color: #1976d2; border-radius: 22px; padding: 8px 20px; font-size: 14px; font-weight: 600; text-decoration: none; }
+    .back-link:hover { background: rgba(25,118,210,0.08); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-box { background: rgba(255,255,255,0.85); border: 1px solid #dce8f5; border-radius: 16px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(25,118,210,0.06); }
+    .stat-box .num { font-size: 30px; font-weight: 700; color: #1a3a5c; }
+    .stat-box .label { font-size: 13px; color: #666; margin-top: 4px; }
+    .stat-box.blue .num { color: #1976d2; }
+    .stat-box.green .num { color: #2e7d32; }
+    .stat-box.orange .num { color: #d97706; }
+    .stat-box.red .num { color: #c62828; }
+    .stat-box.purple .num { color: #7b1fa2; }
+    .stat-box.gold .num { color: #b8860b; }
+    .card { background: rgba(255,255,255,0.85); border: 1px solid #dce8f5; border-radius: 16px; padding: 24px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(25,118,210,0.06); }
+    .card h2 { margin: 0 0 18px; font-size: 19px; color: #1a3a5c; }
+    .chart { display: flex; align-items: flex-end; gap: 6px; height: 160px; border-bottom: 2px solid #e3edf7; padding-bottom: 0; }
+    .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+    .col-bars { display: flex; align-items: flex-end; gap: 3px; width: 100%; justify-content: center; }
+    .bar-up { width: 12px; background: #1976d2; border-radius: 4px 4px 0 0; min-height: 2px; }
+    .bar-ok { width: 12px; background: #2e7d32; border-radius: 4px 4px 0 0; min-height: 2px; }
+    .col-num { font-size: 11px; color: #888; margin-bottom: 4px; }
+    .col-label { font-size: 11px; color: #888; margin-top: 6px; }
+    .legend { display: flex; gap: 20px; margin-top: 14px; font-size: 13px; color: #555; }
+    .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+    .cat-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .cat-name { width: 110px; font-size: 14px; color: #444; flex-shrink: 0; }
+    .cat-track { flex: 1; background: #eef4fb; border-radius: 8px; height: 20px; overflow: hidden; }
+    .cat-fill { height: 100%; background: linear-gradient(90deg, #1976d2, #64b5f6); border-radius: 8px; min-width: 2px; }
+    .cat-count { width: 48px; text-align: right; font-size: 14px; font-weight: 600; color: #1a3a5c; flex-shrink: 0; }
+    .rank-row { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-bottom: 1px solid #eef4fb; font-size: 14px; }
+    .rank-row:last-child { border-bottom: none; }
+    .rank-no { width: 34px; height: 34px; border-radius: 50%; background: #eef4fb; color: #1976d2; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+    .rank-row:nth-child(1) .rank-no { background: #ffd700; color: #7a5c00; }
+    .rank-row:nth-child(2) .rank-no { background: #c0c0c0; color: #555; }
+    .rank-row:nth-child(3) .rank-no { background: #cd7f32; color: #fff; }
+    .rank-name { flex: 1; color: #333; }
+    .rank-count { font-weight: 700; color: #1a3a5c; }
+    .work-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .work-table th { text-align: left; padding: 10px 12px; background: #eef4fb; color: #1a3a5c; font-weight: 600; }
+    .work-table th:first-child { border-radius: 10px 0 0 10px; }
+    .work-table th:last-child { border-radius: 0 10px 10px 0; }
+    .work-table td { padding: 10px 12px; border-bottom: 1px solid #eef4fb; color: #444; }
+    .work-table tr:last-child td { border-bottom: none; }
+    .work-table .t-name { font-weight: 600; color: #1a3a5c; }
+    .work-table .t-total { font-weight: 700; color: #1976d2; }
+    .t-ok { color: #2e7d32; font-weight: 600; }
+    .t-no { color: #c62828; font-weight: 600; }
+    .t-ch { color: #7b1fa2; font-weight: 600; }
+    .empty { color: #999; font-size: 14px; text-align: center; padding: 20px 0; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+  <div class="stats-wrap">
+    <div class="page-head">
+      <h1>📊 統計儀表板</h1>
+      <a href="/admin" class="back-link">← 返回審核中心</a>
+    </div>
+
+    <div class="grid">
+      <div class="stat-box blue"><div class="num"><%= totalPhotos %></div><div class="label">總上載</div></div>
+      <div class="stat-box green"><div class="num"><%= approvedCount %></div><div class="label">已通過</div></div>
+      <div class="stat-box orange"><div class="num"><%= pendingCount %></div><div class="label">待審核</div></div>
+      <div class="stat-box purple"><div class="num"><%= changesCount %></div><div class="label">補充資料中</div></div>
+      <div class="stat-box red"><div class="num"><%= rejectedCount %></div><div class="label">已拒絕</div></div>
+      <div class="stat-box green"><div class="num"><%= rate %>%</div><div class="label">通過率</div></div>
+      <div class="stat-box gold"><div class="num"><%= featured %></div><div class="label">精選作品</div></div>
+      <div class="stat-box blue"><div class="num"><%= members %></div><div class="label">註冊會員</div></div>
+      <div class="stat-box red"><div class="num"><%= bannedCount %></div><div class="label">被封鎖會員</div></div>
+      <div class="stat-box blue"><div class="num"><%= newsApproved %></div><div class="label">已發佈新聞</div></div>
+      <div class="stat-box orange"><div class="num"><%= newsPending %></div><div class="label">待審核新聞</div></div>
+    </div>
+
+    <div class="card">
+      <h2>📅 近 14 日趨勢</h2>
+      <div class="chart">
+        <% days.forEach(function(d) { %>
+          <div class="col">
+            <div class="col-num"><%= d.uploads + d.approved > 0 ? (d.uploads + '/' + d.approved) : '' %></div>
+            <div class="col-bars">
+              <div class="bar-up" style="height:<%= Math.round(d.uploads / maxDay * 100) %>%;"></div>
+              <div class="bar-ok" style="height:<%= Math.round(d.approved / maxDay * 100) %>%;"></div>
+            </div>
+            <div class="col-label"><%= d.label %></div>
+          </div>
+        <% }); %>
+      </div>
+      <div class="legend">
+        <span><i style="background:#1976d2;"></i>上載</span>
+        <span><i style="background:#2e7d32;"></i>通過</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🏷️ 塗裝分類分佈（已通過相片）</h2>
+      <% catCounts.forEach(function(c) { %>
+        <div class="cat-row">
+          <div class="cat-name"><%= c.name %></div>
+          <div class="cat-track"><div class="cat-fill" style="width:<%= Math.round(c.count / maxCat * 100) %>%;"></div></div>
+          <div class="cat-count"><%= c.count %></div>
+        </div>
+      <% }); %>
+    </div>
+
+    <div class="card">
+      <h2>🏆 上載者排行（頭 10 名）</h2>
+      <% if (topUploaders.length === 0) { %>
+        <p class="empty">暫時未有已通過嘅相片</p>
+      <% } else { %>
+        <% topUploaders.forEach(function(u, i) { %>
+          <div class="rank-row">
+            <div class="rank-no"><%= i + 1 %></div>
+            <div class="rank-name"><%= u.name %></div>
+            <div class="rank-count"><%= u.count %> 張</div>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+
+    <div class="card">
+      <h2>🧑‍⚖️ <%= (user && user.isSuper) ? '審核員工作量' : '我嘅工作量' %></h2>
+      <% if (reviewers.length === 0) { %>
+        <p class="empty">暫時未有審核紀錄</p>
+      <% } else { %>
+        <table class="work-table">
+          <tr>
+            <th>審核員</th>
+            <th>✅ 通過</th>
+            <th>❌ 拒絕</th>
+            <th>✏️ 補充資料</th>
+            <th>📰 新聞審核</th>
+            <th>總計</th>
+            <th>最近審核時間</th>
+          </tr>
+          <% reviewers.forEach(function(r) { %>
+            <tr>
+              <td class="t-name"><%= r.name %></td>
+              <td class="t-ok"><%= r.approved %></td>
+              <td class="t-no"><%= r.rejected %></td>
+              <td class="t-ch"><%= r.changes %></td>
+              <td><%= r.newsDone %></td>
+              <td class="t-total"><%= r.total %></td>
+              <td><%= r.last ? new Date(r.last).toLocaleString('zh-HK') : '—' %></td>
+            </tr>
+          <% }); %>
+        </table>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

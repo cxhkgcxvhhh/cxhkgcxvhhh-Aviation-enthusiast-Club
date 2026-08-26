@@ -1,300 +1,290 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../config/database');
 const multer = require('multer');
 const path = require('path');
-const db = require('../config/database');
-const { ensureAuthenticated } = require('../middleware/auth');
+const https = require('https');
 
-// 設定上傳
+// ========== 上傳設定 ==========
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/uploads/');
-    },
+    destination: (req, file, cb) => { cb(null, 'public/uploads/'); },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
     }
 });
 
 const upload = multer({ 
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) {
-            cb(null, true);
-        } else {
-            cb(new Error('只接受圖片檔案'), false);
-        }
+        if (file.mimetype.startsWith('image/')) cb(null, true);
+        else cb(new Error('只接受圖片檔案'));
     }
 });
 
-// 取得已審核照片（公眾）
+// ========== 輔助函數：HTTP GET Promise 包裝 ==========
+function httpGetJson(url, timeout = 8000) {
+    return new Promise((resolve, reject) => {
+        const req = https.get(url, { timeout }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                try { resolve(JSON.parse(data)); } 
+                catch (e) { reject(new Error('JSON parse error')); }
+            });
+        });
+        req.on('error', reject);
+        req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+    });
+}
+
+// ========== 從 Callsign 推斷航空公司 ==========
+function getAirlineFromCallsign(callsign) {
+    if (!callsign) return '';
+    const prefix = callsign.substring(0, 3).toUpperCase();
+    const airlines = {
+        'CPA': '國泰航空', 'CX': '國泰航空',
+        'HKE': '香港快運', 'UO': '香港快運',
+        'CRK': '香港航空', 'HX': '香港航空',
+        'HDA': '港龍航空',
+        'CAL': '中華航空', 'CI': '中華航空',
+        'EVA': '長榮航空', 'BR': '長榮航空',
+        'CES': '中國東方航空', 'MU': '中國東方航空',
+        'CSN': '中國南方航空', 'CZ': '中國南方航空',
+        'CCA': '中國國際航空', 'CA': '中國國際航空',
+        'HVN': '越南航空',
+        'JAL': '日本航空', 'JL': '日本航空',
+        'ANA': '全日空', 'NH': '全日空',
+        'KAL': '大韓航空', 'KE': '大韓航空',
+        'AAR': '韓亞航空', 'OZ': '韓亞航空',
+        'SIA': '新加坡航空', 'SQ': '新加坡航空',
+        'MAS': '馬來西亞航空', 'MH': '馬來西亞航空',
+        'THA': '泰國航空', 'TG': '泰國航空',
+        'UAE': '阿聯酋航空', 'EK': '阿聯酋航空',
+        'ETD': '阿提哈德航空', 'EY': '阿提哈德航空',
+        'QTR': '卡塔爾航空', 'QR': '卡塔爾航空',
+        'BAW': '英國航空', 'BA': '英國航空',
+        'AAL': '美國航空', 'AA': '美國航空',
+        'UAL': '聯合航空', 'UA': '聯合航空',
+        'DAL': '達美航空', 'DL': '達美航空',
+        'DLH': '漢莎航空', 'LH': '漢莎航空',
+        'AFR': '法國航空', 'AF': '法國航空',
+        'KLM': '荷蘭航空', 'KL': '荷蘭航空',
+        'QFA': '澳洲航空', 'QF': '澳洲航空'
+    };
+    return airlines[prefix] || '';
+}
+
+// ========== ICAO 機型代碼轉常用名稱 ==========
+function icaoToType(icaoType) {
+    if (!icaoType) return '';
+    const map = {
+        'A20N': 'A320neo', 'A21N': 'A321neo', 'A19N': 'A319neo',
+        'A320': 'A320', 'A321': 'A321', 'A319': 'A319',
+        'A332': 'A330-200', 'A333': 'A330-300', 'A338': 'A330-800', 'A339': 'A330-900',
+        'A359': 'A350-900', 'A35K': 'A350-1000',
+        'A388': 'A380-800',
+        'B38M': '737 MAX 8', 'B39M': '737 MAX 9', 'B3XM': '737 MAX 10',
+        'B737': 'B737', 'B738': 'B737-800', 'B739': 'B737-900',
+        'B744': 'B747-400', 'B748': 'B747-8',
+        'B772': 'B777-200', 'B773': 'B777-300', 'B77W': 'B777-300ER',
+        'B778': 'B777-8', 'B779': 'B777-9',
+        'B788': 'B787-8', 'B789': 'B787-9', 'B78X': 'B787-10',
+        'E190': 'E190', 'E195': 'E195', 'E290': 'E190-E2', 'E295': 'E195-E2',
+        'A306': 'A300', 'A310': 'A310',
+        'B762': 'B767-200', 'B763': 'B767-300', 'B764': 'B767-400',
+        'MD11': 'MD-11', 'DC10': 'DC-10',
+        'A124': 'An-124', 'A225': 'An-225',
+        'C172': 'Cessna 172', 'C208': 'Cessna 208',
+        'GLF5': 'Gulfstream G550', 'GLF6': 'Gulfstream G650',
+        'CL60': 'Challenger 600', 'GLEX': 'Global Express'
+    };
+    return map[icaoType.toUpperCase()] || icaoType;
+}
+
+// ============================================
+// 飛機註冊號自動搜尋（四重來源）
+// ============================================
+router.get('/lookup-aircraft/:reg', async (req, res) => {
+    const reg = req.params.reg.toUpperCase().trim().replace(/\s+/g, '');
+    if (!reg) return res.json({ success: false, message: '請輸入註冊號' });
+
+    // 第一步：專用飛機資料庫
+    try {
+        const [dbResults] = await db.execute(
+            'SELECT airline, aircraft_type, registration FROM aircraft_db WHERE registration = ? LIMIT 1',
+            [reg]
+        );
+        if (dbResults.length > 0) {
+            return res.json({
+                success: true,
+                source: 'database',
+                aircraft: {
+                    airline: dbResults[0].airline || '',
+                    type: dbResults[0].aircraft_type || '',
+                    registration: dbResults[0].registration
+                }
+            });
+        }
+    } catch (err) { console.error('資料庫搜尋錯誤:', err); }
+
+    // 第二步：舊照片記錄
+    try {
+        const [localResults] = await db.execute(
+            `SELECT DISTINCT airline, aircraft_type, registration 
+             FROM photos 
+             WHERE registration = ? AND airline IS NOT NULL AND aircraft_type IS NOT NULL
+             LIMIT 1`, [reg]
+        );
+        if (localResults.length > 0) {
+            return res.json({
+                success: true,
+                source: 'history',
+                aircraft: {
+                    airline: localResults[0].airline || '',
+                    type: localResults[0].aircraft_type || '',
+                    registration: localResults[0].registration
+                }
+            });
+        }
+    } catch (err) { console.error('歷史搜尋錯誤:', err); }
+
+    // 第三步：adsbdb API（免費，唔使 Key）
+    try {
+        const adsbdbData = await httpGetJson(`https://api.adsbdb.com/v0/aircraft/${encodeURIComponent(reg)}`);
+        if (adsbdbData.response && adsbdbData.response.aircraft) {
+            const ac = adsbdbData.response.aircraft;
+            return res.json({
+                success: true,
+                source: 'adsbdb',
+                aircraft: {
+                    airline: ac.registered_owner || '',
+                    type: ac.type || ac.icao_type || '',
+                    registration: ac.registration || reg
+                }
+            });
+        }
+    } catch (err) { console.error('adsbdb 錯誤:', err.message); }
+
+    // 第四步：adsb.lol API（免費，唔使 Key，live 飛機）
+    const adsbLolUrls = [
+        `https://api.adsb.lol/v2/aircraft?r=${encodeURIComponent(reg)}`,
+        `https://api.adsb.lol/v2/aircraft?reg=${encodeURIComponent(reg)}`,
+        `https://api.adsb.lol/v2/aircraft?registration=${encodeURIComponent(reg)}`
+    ];
+    
+    for (const url of adsbLolUrls) {
+        try {
+            const data = await httpGetJson(url, 5000);
+            if (data.ac && data.ac.length > 0) {
+                const ac = data.ac[0];
+                const airline = getAirlineFromCallsign(ac.flight);
+                const type = icaoToType(ac.t);
+                return res.json({
+                    success: true,
+                    source: 'adsb.lol',
+                    aircraft: {
+                        airline: airline,
+                        type: type,
+                        registration: ac.r || reg
+                    }
+                });
+            }
+        } catch (err) { continue; }
+    }
+
+    // 全部搵唔到
+    res.json({ 
+        success: false, 
+        message: `資料庫暫時未有 ${reg} 的資料，請手動填寫，或聯絡管理員添加`,
+        code: 'NOT_FOUND'
+    });
+});
+
+// 獲取已批准照片（公開）
 router.get('/', async (req, res) => {
     try {
-        const [photos] = await db.execute(`
-            SELECT p.*, u.display_name, u.avatar_url 
-            FROM photos p 
-            JOIN users u ON p.user_id = u.id 
-            WHERE p.status = 'approved' 
-            ORDER BY p.created_at DESC
-        `);
-
-        // 如果用戶已登入，檢查佢有冇 like/fav
-        if (req.isAuthenticated && req.isAuthenticated()) {
-            const userId = req.user.id;
-            for (let photo of photos) {
-                const [likes] = await db.execute(
-                    'SELECT id FROM likes WHERE photo_id = ? AND user_id = ?',
-                    [photo.id, userId]
-                );
-                const [favs] = await db.execute(
-                    'SELECT id FROM favorites WHERE photo_id = ? AND user_id = ?',
-                    [photo.id, userId]
-                );
-                photo.user_liked = likes.length > 0;
-                photo.user_favorited = favs.length > 0;
-            }
-        }
-        
+        const [photos] = await db.execute(`  
+            SELECT p.*, u.display_name, u.avatar_url,
+            (SELECT COUNT(*) FROM likes WHERE photo_id = p.id) as like_count,
+            (SELECT COUNT(*) FROM comments WHERE photo_id = p.id) as comment_count
+            FROM photos p JOIN users u ON p.user_id = u.id 
+            WHERE p.status = 'approved' ORDER BY p.created_at DESC
+          `);
         res.json(photos);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 上傳照片（必須登入）
-router.post('/upload', ensureAuthenticated, upload.single('photo'), async (req, res) => {
+// 獲取單張照片詳情
+router.get('/:id', async (req, res) => {
     try {
-        const { airline, destination, destination_code, aircraft_registration, flight_number, aircraft_model, engine_type } = req.body;
-
-        if (!req.file) {
-            return res.status(400).json({ error: '請選擇照片' });
-        }
-
-        await db.execute(
-            `INSERT INTO photos (user_id, photo_path, airline, destination, destination_code, aircraft_registration, flight_number, aircraft_model, engine_type, status) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-            [req.user.id, '/uploads/' + req.file.filename, airline, destination, destination_code, aircraft_registration, flight_number, aircraft_model || null, engine_type || null]
-        );
-        
-        res.json({ success: true, message: '照片已上傳，等待審核' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 取得待審核照片（管理員）
-router.get('/pending', ensureAuthenticated, async (req, res) => {
-    try {
-        if (!req.user.is_admin) {
-            return res.status(403).json({ error: '無權限' });
-        }
-        const [photos] = await db.execute(`
-            SELECT p.*, u.display_name, u.avatar_url, u.score
-            FROM photos p 
-            JOIN users u ON p.user_id = u.id 
-            WHERE p.status = 'pending' 
-            ORDER BY p.created_at DESC
-        `);
-        res.json(photos);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 審核照片（管理員）
-router.post('/review/:id', ensureAuthenticated, async (req, res) => {
-    try {
-        if (!req.user.is_admin) {
-            return res.status(403).json({ error: '無權限' });
-        }
-        
-        const { status, rejection_reason } = req.body;
-        const photoId = req.params.id;
-        
-        const [photo] = await db.execute('SELECT * FROM photos WHERE id = ?', [photoId]);
-        if (photo.length === 0) {
-            return res.status(404).json({ error: '照片不存在' });
-        }
-        
-        await db.execute(
-            'UPDATE photos SET status = ?, rejection_reason = ? WHERE id = ?',
-            [status, rejection_reason || null, photoId]
-        );
-        
-        // 更新用戶分數
-        const scoreChange = status === 'approved' ? 1 : -1;
-        await db.execute(
-            'UPDATE users SET score = score + ? WHERE id = ?',
-            [scoreChange, photo[0].user_id]
-        );
-        
-        res.json({ success: true, message: status === 'approved' ? '審核通過 (+1分)' : '審核拒絕 (-1分)' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 讚好
-router.post('/:id/like', ensureAuthenticated, async (req, res) => {
-    try {
-        const photoId = req.params.id;
-        const userId = req.user.id;
-        
-        await db.execute(
-            'INSERT IGNORE INTO likes (photo_id, user_id) VALUES (?, ?)',
-            [photoId, userId]
-        );
-        
-        await db.execute(
-            'UPDATE photos SET likes_count = likes_count + 1 WHERE id = ?',
-            [photoId]
-        );
-        
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 取消讚好
-router.delete('/:id/like', ensureAuthenticated, async (req, res) => {
-    try {
-        const photoId = req.params.id;
-        const userId = req.user.id;
-        
-        await db.execute(
-            'DELETE FROM likes WHERE photo_id = ? AND user_id = ?',
-            [photoId, userId]
-        );
-        
-        await db.execute(
-            'UPDATE photos SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = ?',
-            [photoId]
-        );
-        
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 收藏
-router.post('/:id/favorite', ensureAuthenticated, async (req, res) => {
-    try {
-        const photoId = req.params.id;
-        const userId = req.user.id;
-        
-        await db.execute(
-            'INSERT IGNORE INTO favorites (photo_id, user_id) VALUES (?, ?)',
-            [photoId, userId]
-        );
-        
-        await db.execute(
-            'UPDATE photos SET favorites_count = favorites_count + 1 WHERE id = ?',
-            [photoId]
-        );
-        
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 取消收藏
-router.delete('/:id/favorite', ensureAuthenticated, async (req, res) => {
-    try {
-        const photoId = req.params.id;
-        const userId = req.user.id;
-        
-        await db.execute(
-            'DELETE FROM favorites WHERE photo_id = ? AND user_id = ?',
-            [photoId, userId]
-        );
-        
-        await db.execute(
-            'UPDATE photos SET favorites_count = GREATEST(favorites_count - 1, 0) WHERE id = ?',
-            [photoId]
-        );
-        
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 新增評論
-router.post('/:id/comment', ensureAuthenticated, async (req, res) => {
-    try {
-        const photoId = req.params.id;
-        const { content } = req.body;
-        
-        if (!content || content.trim() === '') {
-            return res.status(400).json({ error: '評論內容不能為空' });
-        }
-        
-        const [result] = await db.execute(
-            'INSERT INTO comments (photo_id, user_id, content) VALUES (?, ?, ?)',
-            [photoId, req.user.id, content.trim()]
-        );
-        
-        res.json({ success: true, commentId: result.insertId });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 取得評論
-router.get('/:id/comments', async (req, res) => {
-    try {
-        const photoId = req.params.id;
-        const [comments] = await db.execute(`
-            SELECT c.*, u.display_name, u.avatar_url 
-            FROM comments c 
-            JOIN users u ON c.user_id = u.id 
-            WHERE c.photo_id = ? 
-            ORDER BY c.created_at DESC
-        `, [photoId]);
-        res.json(comments);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// 取得單張照片詳情（俾 photo-detail 頁面用）
-router.get('/:id/detail', async (req, res) => {
-    try {
-        const [photos] = await db.execute(`
-            SELECT p.*, u.display_name, u.avatar_url 
-            FROM photos p 
-            JOIN users u ON p.user_id = u.id 
+        const [photos] = await db.execute(`  
+            SELECT p.*, u.display_name, u.avatar_url,
+            (SELECT COUNT(*) FROM likes WHERE photo_id = p.id) as like_count
+            FROM photos p JOIN users u ON p.user_id = u.id 
             WHERE p.id = ? AND p.status = 'approved'
-        `, [req.params.id]);
-        
-        if (photos.length === 0) {
-            return res.status(404).json({ error: '照片不存在或未審核' });
+          `, [req.params.id]);
+        if (photos.length === 0) return res.status(404).json({ error: '照片不存在' });
+        const [comments] = await db.execute(`  
+            SELECT c.*, u.display_name, u.avatar_url 
+            FROM comments c JOIN users u ON c.user_id = u.id 
+            WHERE c.photo_id = ? ORDER BY c.created_at DESC
+          `, [req.params.id]);
+        res.json({ photo: photos[0], comments });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 上傳照片（需登入）
+router.post('/upload', upload.single('image'), async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: '請先登入' });
+    try {
+        const { title, description, airline, aircraft_type, registration, origin, destination, location, photo_date } = req.body;
+        const imageUrl = '/uploads/' + req.file.filename;
+        const [result] = await db.execute(
+            `INSERT INTO photos (user_id, title, description, image_url, airline, aircraft_type, registration, origin, destination, location, photo_date, status)   
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+            [req.user.id, title, description, imageUrl, airline, aircraft_type, registration, origin, destination, location, photo_date]
+        );
+        res.json({ success: true, photoId: result.insertId, message: '照片上傳成功，等待審核' });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 新增評論（需登入）
+router.post('/:id/comments', async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: '請先登入' });
+    try {
+        const { content } = req.body;
+        await db.execute('INSERT INTO comments (photo_id, user_id, content) VALUES (?, ?, ?)',
+            [req.params.id, req.user.id, content]);
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 喜歡/取消喜歡（需登入）
+router.post('/:id/like', async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: '請先登入' });
+    try {
+        const [existing] = await db.execute('SELECT * FROM likes WHERE photo_id = ? AND user_id = ?',
+            [req.params.id, req.user.id]);
+        if (existing.length > 0) {
+            await db.execute('DELETE FROM likes WHERE photo_id = ? AND user_id = ?', [req.params.id, req.user.id]);
+            res.json({ liked: false });
+        } else {
+            await db.execute('INSERT INTO likes (photo_id, user_id) VALUES (?, ?)', [req.params.id, req.user.id]);
+            res.json({ liked: true });
         }
-        
-        const photo = photos[0];
-        
-        // 檢查用戶 like/fav 狀態
-        if (req.isAuthenticated && req.isAuthenticated()) {
-            const userId = req.user.id;
-            const [likes] = await db.execute(
-                'SELECT id FROM likes WHERE photo_id = ? AND user_id = ?',
-                [photo.id, userId]
-            );
-            const [favs] = await db.execute(
-                'SELECT id FROM favorites WHERE photo_id = ? AND user_id = ?',
-                [photo.id, userId]
-            );
-            photo.user_liked = likes.length > 0;
-            photo.user_favorited = favs.length > 0;
-        }
-        
-        res.json(photo);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 檢查是否已喜歡
+router.get('/:id/like-status', async (req, res) => {
+    if (!req.isAuthenticated()) return res.json({ liked: false });
+    try {
+        const [existing] = await db.execute('SELECT * FROM likes WHERE photo_id = ? AND user_id = ?',
+            [req.params.id, req.user.id]);
+        res.json({ liked: existing.length > 0 });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 module.exports = router;

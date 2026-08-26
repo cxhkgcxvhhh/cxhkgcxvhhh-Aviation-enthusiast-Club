@@ -1,538 +1,474 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>上載照片 - cxhkgcxvhhh Aviation enthusiast Club 圖庫</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>上傳作品 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
+      min-height: 100vh; color: #1a2b3c;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 36px 20px 60px; }
+    .page-title {
+      font-size: 24px; font-weight: 700;
+      border-left: 4px solid #1976d2; padding-left: 12px; margin-bottom: 18px;
+    }
 
-        body {
-            background: #f8fafc;
-            color: #0f172a;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    .online-bar {
+      display: inline-flex; align-items: center; gap: 8px;
+      border-radius: 20px; padding: 8px 18px; font-size: 13px; color: #5f7285; margin-bottom: 22px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.on { background: #2e7d32; box-shadow: 0 0 6px rgba(46,125,50,0.6); }
+    .dot.off { background: #b0bec5; }
 
-        .navbar {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid #e2e8f0;
-            padding: 16px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
-        }
+    /* 訊息框（預設隱藏！） */
+    .msg { border-radius: 12px; padding: 14px 18px; font-size: 14px; margin-bottom: 18px; display: none; }
+    .msg.show { display: block; }
+    .msg.error { background: #fff0f0; border: 1px solid #f3c2c2; color: #a33; }
+    .msg.success { background: #eefaf0; border: 1px solid #b7e2bd; color: #2e7d32; }
 
-        .nav-brand a {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #0f172a;
-            text-decoration: none;
-            letter-spacing: -0.3px;
-        }
+    .tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .tab-btn {
+      background: transparent; border: 2px solid #1976d2; color: #1976d2;
+      border-radius: 22px; padding: 8px 22px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .tab-btn:hover { background: #eaf3fc; }
+    .tab-btn.active { background: #1976d2; color: #ffffff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .card { border-radius: 16px; padding: 26px 28px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 13px; font-weight: 600; color: #34495e; margin-bottom: 6px; }
+    label .req { color: #d32f2f; }
+    label .opt { color: #8ba0b3; font-weight: 400; font-size: 12px; }
+    input[type="text"], input[type="date"], input[type="file"], textarea {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #d8e3ee; border-radius: 10px;
+      font-size: 14px; font-family: inherit; color: #1a2b3c;
+      transition: border-color 0.15s;
+    }
+    input:focus, textarea:focus { outline: none; border-color: #1976d2; }
+    textarea { resize: vertical; min-height: 90px; }
+    .hint { font-size: 12px; color: #8ba0b3; margin-top: 4px; }
+    .auto-fill { font-size: 12px; color: #2e7d32; margin-top: 4px; min-height: 16px; }
 
-        .nav-btn {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            color: #3b82f6;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+    /* 航空公司全稱建議（可以撳） */
+    .suggest {
+      font-size: 12px; color: #1565c0; margin-top: 4px; min-height: 16px;
+      cursor: pointer; font-weight: 600;
+    }
+    .suggest:hover { text-decoration: underline; }
 
-        .nav-btn:hover {
-            background: #3b82f6;
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .nav-btn.secondary {
-            background: rgba(255, 255, 255, 0.6);
-            border: 1px solid #e2e8f0;
-            color: #0f172a;
-        }
-
-        .nav-btn.secondary:hover {
-            background: white;
-            border-color: #cbd5e1;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 40px 20px;
-            flex: 1;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            color: #0f172a;
-            letter-spacing: -0.5px;
-        }
-
-        .subtitle {
-            color: #64748b;
-            margin-bottom: 35px;
-            font-weight: 500;
-        }
-
-        .upload-form {
-            background: white;
-            border-radius: 20px;
-            padding: 35px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-            border: 1px solid #e2e8f0;
-        }
-
-        .form-section {
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #3b82f6;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #334155;
-        }
-
-        .form-group label .required {
-            color: #ef4444;
-            margin-left: 3px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #0f172a;
-            transition: all 0.2s;
-            background: #f8fafc;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        .form-group input::placeholder {
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .file-upload-area {
-            border: 2px dashed #cbd5e1;
-            border-radius: 16px;
-            padding: 50px 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #f8fafc;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .file-upload-area:hover {
-            border-color: #3b82f6;
-            background: rgba(59, 130, 246, 0.03);
-        }
-
-        .file-upload-area.has-file {
-            border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.05);
-        }
-
-        .file-upload-area input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .upload-text {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #334155;
-            margin-bottom: 5px;
-        }
-
-        .upload-hint {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .file-name {
-            font-size: 0.9rem;
-            color: #22c55e;
-            font-weight: 700;
-            margin-top: 10px;
-        }
-
-        .preview-image {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 12px;
-            margin-top: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .auto-fill-btn {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .auto-fill-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
-        }
-
-        .auto-fill-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.25);
-            letter-spacing: 0.5px;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.35);
-        }
-
-        .submit-btn:active {
-            transform: scale(0.98);
-        }
-
-        .message {
-            margin-top: 20px;
-            padding: 16px 20px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            display: none;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .message.success {
-            display: flex;
-            background: rgba(34, 197, 94, 0.1);
-            color: #15803d;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-
-        .message.error {
-            display: flex;
-            background: rgba(239, 68, 68, 0.1);
-            color: #b91c1c;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .site-footer {
-            text-align: center;
-            padding: 25px 20px;
-            font-size: 0.8rem;
-            color: #94a3b8;
-            border-top: 1px solid #e2e8f0;
-            background: white;
-            font-weight: 500;
-        }
-
-        @media (max-width: 640px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            .upload-form {
-                padding: 25px 20px;
-            }
-            .navbar {
-                padding: 12px 16px;
-            }
-        }
-    </style>
+    .submit-btn {
+      margin-top: 22px; width: 100%; padding: 14px;
+      background: transparent; border: 2px solid #1976d2; border-radius: 24px;
+      color: #1976d2; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .submit-btn:hover { background: #1976d2; color: #fff; }
+  </style>
 </head>
 <body>
+  <%- include('partials/header') %>
 
-    <nav class="navbar">
-        <div class="nav-brand">
-            <a href="/">✈️ cxhkgcxvhhh Aviation enthusiast Club 圖庫</a>
-        </div>
-        <div class="nav-links">
-            <a href="/" class="nav-btn secondary">← 返回首頁</a>
-            <a href="/auth/logout" class="nav-btn secondary">登出</a>
-        </div>
-    </nav>
+  <div class="wrap">
+    <div class="page-title">上傳</div>
 
-    <div class="container">
-        <h1>📤 上載飛機照片</h1>
-        <p class="subtitle">填寫航班資料，分享你嘅航空攝影作品</p>
-
-        <form id="upload-form" class="upload-form" enctype="multipart/form-data">
-            
-            <div class="form-section">
-                <div class="section-title">📷 選擇照片</div>
-                <div class="file-upload-area" id="dropZone">
-                    <input type="file" name="photo" accept="image/*" required id="fileInput">
-                    <div class="upload-icon">📸</div>
-                    <div class="upload-text">點擊或拖曳照片上載</div>
-                    <div class="upload-hint">支援 JPG、PNG、WEBP 格式，最大 10MB</div>
-                    <div class="file-name" id="fileName"></div>
-                    <img id="preview" class="preview-image" style="display:none;">
-                </div>
-            </div>
-
-            <div class="form-section">
-                <div class="section-title">✈️ 航班資料</div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>航空公司 <span class="required">*</span></label>
-                        <input type="text" name="airline" placeholder="例如：國泰航空 Cathay Pacific" required>
-                    </div>
-                    <div class="form-group">
-                        <label>航班號 <span class="required">*</span></label>
-                        <input type="text" name="flight_number" placeholder="例如：CX520" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>目的地 <span class="required">*</span></label>
-                        <input type="text" name="destination" placeholder="例如：東京 Tokyo" required>
-                    </div>
-                    <div class="form-group">
-                        <label>目的地代碼（3字）<span class="required">*</span></label>
-                        <input type="text" name="destination_code" placeholder="例如：HND" maxlength="3" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>飛機註冊號 <span class="required">*</span></label>
-                        <input type="text" name="aircraft_registration" id="regInput" placeholder="例如：B-HNR" required>
-                    </div>
-                    <div class="form-group">
-                        <label>飛機型號</label>
-                        <input type="text" name="aircraft_model" id="modelInput" placeholder="例如：Boeing 777-300ER">
-                    </div>
-                </div>
-
-                <div class="form-group full">
-                    <label>引擎型號</label>
-                    <input type="text" name="engine_type" id="engineInput" placeholder="例如：GE90-115B">
-                    <button type="button" class="auto-fill-btn" id="autoFillBtn" onclick="autoFillEngine()">
-                        🔍 自動搜尋引擎型號
-                    </button>
-                </div>
-            </div>
-
-            <button type="submit" class="submit-btn">✈️ 提交審核</button>
-            <div id="message" class="message"></div>
-        </form>
+    <div class="online-bar">
+      <span class="dot off" id="adminDot"></span>
+      <span id="adminText">正在檢查審核員狀態…</span>
     </div>
 
-    <footer class="site-footer">
-        Powered by cxhkgcxvhhh Aviation enthusiast Club © 2026
-    </footer>
+    <div class="msg error" id="errMissing">⚠️ 提交失敗：除咗「相機設定」同「額外資料」，其他欄位同相片都必須填寫先可以提交！</div>
+    <div class="msg error" id="errLimit">⚠️ 你今日已經上載咗 20 張相片，到咗每日上限，聽日先再嚟啦！</div>
+    <div class="msg error" id="errNews">⚠️ 新聞提交失敗：標題、內容、來源同配圖全部必須填寫！</div>
+    <div class="msg success" id="successMsg">✅ 上傳成功！相片已進入審核隊列，審核完成後你會收到彩色電郵通知。</div>
+    <div class="msg success" id="newsOkMsg">✅ 新聞已提交！審核通過後會公開發佈。</div>
 
-    <script>
-        // 檔案預覽
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const dropZone = document.getElementById('dropZone');
-            const fileName = document.getElementById('fileName');
-            const preview = document.getElementById('preview');
-            
-            if (file) {
-                dropZone.classList.add('has-file');
-                fileName.textContent = `已選擇：${file.name}`;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('photo', this)">📷 上載相片</button>
+      <button class="tab-btn" onclick="showTab('news', this)">📰 上載新聞</button>
+      <button class="tab-btn" onclick="showTab('airport', this)">🛫 上載機場</button>
+      <button class="tab-btn" onclick="showTab('terminal', this)">🏢 上載客運大樓</button>
+      <button class="tab-btn" onclick="showTab('ground', this)">🧑‍🔧 上載地勤</button>
+    </div>
+
+    <!-- ===== 上載相片 ===== -->
+    <div class="tab-panel active" id="tab-photo">
+      <div class="card">
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <div class="form-grid">
+            <div class="full">
+              <label>相片檔案 <span class="req">*</span></label>
+              <input type="file" name="photo" accept="image/*" required>
+              <div class="hint">上傳後系統會自動喺底部加上窄版水印</div>
+            </div>
+
+            <div>
+              <label>相片標題 <span class="req">*</span></label>
+              <input type="text" name="title" placeholder="例：國泰 A350 降落香港" required>
+            </div>
+
+            <div>
+              <label>飛機註冊號 <span class="req">*</span></label>
+              <input type="text" name="registration" id="regInput" placeholder="例：B-LRA" required>
+              <div class="auto-fill" id="regStatus"></div>
+            </div>
+
+            <div>
+              <label>航空公司 <span class="req">*</span></label>
+              <input type="text" name="airline" id="airlineInput" placeholder="例：國泰 / CX" required>
+              <div class="suggest" id="airlineSuggest"></div>
+            </div>
+
+            <div>
+              <label>航班編號 <span class="req">*</span></label>
+              <input type="text" name="flight_number" placeholder="例：CX888" required>
+            </div>
+
+            <div>
+              <label>機型 <span class="req">*</span></label>
+              <input type="text" name="aircraft_type" id="typeInput" placeholder="例：A350-900" required>
+            </div>
+
+            <div>
+              <label>塗裝 <span class="req">*</span></label>
+              <input type="text" name="livery" id="liveryInput" placeholder="例：標準塗裝 / 特別塗裝名稱" required>
+            </div>
+
+            <div>
+              <label>出發機場 <span class="req">*</span></label>
+              <input type="text" name="origin" id="originInput" placeholder="例：HKG" required>
+              <div class="auto-fill" id="originName"></div>
+            </div>
+
+            <div>
+              <label>目的地機場 <span class="req">*</span></label>
+              <input type="text" name="destination" id="destInput" placeholder="例：NRT" required>
+              <div class="auto-fill" id="destName"></div>
+            </div>
+
+            <div>
+              <label>拍攝日期 <span class="req">*</span></label>
+              <input type="date" name="photo_date" required>
+            </div>
+
+            <div>
+              <label>拍攝位置 <span class="req">*</span></label>
+              <input type="text" name="location" placeholder="例：香港國際機場 南跑道觀景台" required>
+            </div>
+
+            <div class="full">
+              <label>相機設定 <span class="opt">（選填，例：Canon R5 + RF 100-500mm，1/1000s f/6.3 ISO400）</span></label>
+              <input type="text" name="camera_settings" placeholder="選填">
+            </div>
+
+            <div class="full">
+              <label>額外資料 <span class="opt">（選填）</span></label>
+              <textarea name="extra_info" placeholder="選填：任何想補充嘅資料"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">提交審核</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== 上載新聞 ===== -->
+    <div class="tab-panel" id="tab-news">
+      <div class="card">
+        <form action="/upload-news" method="POST" enctype="multipart/form-data">
+          <div class="form-grid">
+            <div class="full">
+              <label>新聞標題 <span class="req">*</span></label>
+              <input type="text" name="title" placeholder="例：國泰航空宣佈新增航線" required>
+            </div>
+            <div class="full">
+              <label>新聞內容 <span class="req">*</span></label>
+              <textarea name="content" style="min-height:140px;" placeholder="詳細內容…" required></textarea>
+            </div>
+            <div class="full">
+              <label>新聞來源 <span class="req">*</span></label>
+              <input type="text" name="source" placeholder="例：香港01 / 航空公司官方公告" required>
+            </div>
+            <div class="full">
+              <label>新聞配圖 <span class="req">*</span></label>
+              <input type="file" name="news_image" accept="image/*" required>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn">提交新聞</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== 上載機場 ===== -->
+    <div class="tab-panel" id="tab-airport">
+      <div class="card">
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="category" value="airport">
+          <div class="form-grid">
+            <div class="full">
+              <label>相片檔案 <span class="req">*</span></label>
+              <input type="file" name="photo" accept="image/*" required>
+              <div class="hint">上傳後系統會自動喺底部加上窄版水印</div>
+            </div>
+            <div>
+              <label>相片標題 <span class="req">*</span></label>
+              <input type="text" name="title" placeholder="例：香港國際機場南跑道全景" required>
+            </div>
+            <div>
+              <label>機場代碼 <span class="req">*</span></label>
+              <input type="text" name="airport_code" id="apCodeInput" placeholder="例：HKG / VHHH" required>
+              <div class="auto-fill" id="apCodeName"></div>
+            </div>
+            <div>
+              <label>拍攝日期 <span class="req">*</span></label>
+              <input type="date" name="photo_date" required>
+            </div>
+            <div>
+              <label>拍攝位置 <span class="req">*</span></label>
+              <input type="text" name="location" placeholder="例：南跑道觀景台" required>
+            </div>
+            <div class="full">
+              <label>相機設定 <span class="opt">（選填）</span></label>
+              <input type="text" name="camera_settings" placeholder="選填">
+            </div>
+            <div class="full">
+              <label>額外資料 <span class="opt">（選填）</span></label>
+              <textarea name="extra_info" placeholder="選填：任何想補充嘅資料"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn">提交審核</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== 上載客運大樓 ===== -->
+    <div class="tab-panel" id="tab-terminal">
+      <div class="card">
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="category" value="terminal">
+          <div class="form-grid">
+            <div class="full">
+              <label>相片檔案 <span class="req">*</span></label>
+              <input type="file" name="photo" accept="image/*" required>
+              <div class="hint">上傳後系統會自動喺底部加上窄版水印</div>
+            </div>
+            <div>
+              <label>相片標題 <span class="req">*</span></label>
+              <input type="text" name="title" placeholder="例：香港國際機場一號客運大樓離境大堂" required>
+            </div>
+            <div>
+              <label>機場代碼 <span class="req">*</span></label>
+              <input type="text" name="airport_code" id="tmCodeInput" placeholder="例：HKG / VHHH" required>
+              <div class="auto-fill" id="tmCodeName"></div>
+            </div>
+            <div>
+              <label>客運大樓名稱／編號 <span class="req">*</span></label>
+              <input type="text" name="terminal_name" placeholder="例：一號客運大樓 / T1" required>
+            </div>
+            <div>
+              <label>拍攝日期 <span class="req">*</span></label>
+              <input type="date" name="photo_date" required>
+            </div>
+            <div>
+              <label>拍攝位置 <span class="req">*</span></label>
+              <input type="text" name="location" placeholder="例：離境大堂 7 樓" required>
+            </div>
+            <div class="full">
+              <label>相機設定 <span class="opt">（選填）</span></label>
+              <input type="text" name="camera_settings" placeholder="選填">
+            </div>
+            <div class="full">
+              <label>額外資料 <span class="opt">（選填）</span></label>
+              <textarea name="extra_info" placeholder="選填：任何想補充嘅資料"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn">提交審核</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== 上載地勤 ===== -->
+    <div class="tab-panel" id="tab-ground">
+      <div class="card">
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="category" value="ground">
+          <div class="form-grid">
+            <div class="full">
+              <label>相片檔案 <span class="req">*</span></label>
+              <input type="file" name="photo" accept="image/*" required>
+              <div class="hint">上傳後系統會自動喺底部加上窄版水印</div>
+            </div>
+            <div>
+              <label>相片標題 <span class="req">*</span></label>
+              <input type="text" name="title" placeholder="例：停機坪行李車作業中" required>
+            </div>
+            <div>
+              <label>機場代碼 <span class="req">*</span></label>
+              <input type="text" name="airport_code" id="gdCodeInput" placeholder="例：HKG / VHHH" required>
+              <div class="auto-fill" id="gdCodeName"></div>
+            </div>
+            <div>
+              <label>地勤類型 <span class="req">*</span></label>
+              <input type="text" name="ground_type" placeholder="例：行李車 / 加油車 / 登機橋 / 地勤人員" required>
+            </div>
+            <div>
+              <label>拍攝日期 <span class="req">*</span></label>
+              <input type="date" name="photo_date" required>
+            </div>
+            <div>
+              <label>拍攝位置 <span class="req">*</span></label>
+              <input type="text" name="location" placeholder="例：停機坪 B12 閘口" required>
+            </div>
+            <div class="full">
+              <label>相機設定 <span class="opt">（選填）</span></label>
+              <input type="text" name="camera_settings" placeholder="選填">
+            </div>
+            <div class="full">
+              <label>額外資料 <span class="opt">（選填）</span></label>
+              <textarea name="extra_info" placeholder="選填：任何想補充嘅資料"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn">提交審核</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(name, btn) {
+      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      document.getElementById('tab-' + name).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // 顯示訊息（修正咗：預設全部隱藏，有 query 先顯示）
+    var params = new URLSearchParams(location.search);
+    if (params.get('error') === 'missing') {
+      document.getElementById('errMissing').classList.add('show');
+      var errTab = params.get('tab');
+      if (errTab) {
+        var tabNames = ['photo', 'news', 'airport', 'terminal', 'ground'];
+        var ti = tabNames.indexOf(errTab);
+        if (ti > 0) document.querySelectorAll('.tab-btn')[ti].click();
+      }
+    }
+    if (params.get('error') === 'limit') document.getElementById('errLimit').classList.add('show');
+    if (params.get('error') === 'news-missing') {
+      document.getElementById('errNews').classList.add('show');
+      document.querySelectorAll('.tab-btn')[1].click();
+    }
+    if (params.get('success') === '1') document.getElementById('successMsg').classList.add('show');
+    if (params.get('news') === 'ok') {
+      document.getElementById('newsOkMsg').classList.add('show');
+      document.querySelectorAll('.tab-btn')[1].click();
+    }
+
+    // 在線管理員狀態
+    function refreshAdmins() {
+      fetch('/api/online-admins')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          var dot = document.getElementById('adminDot');
+          var text = document.getElementById('adminText');
+          if (d.count > 0) {
+            dot.className = 'dot on';
+            text.textContent = '而家有 ' + d.count + ' 位審核員在線，通常好快就審到你嘅相！';
+          } else {
+            dot.className = 'dot off';
+            text.textContent = '而家冇審核員在線，審核可能要等耐少少。';
+          }
+        })
+        .catch(function() {
+          document.getElementById('adminText').textContent = '無法檢查審核員狀態';
         });
+    }
+    refreshAdmins();
+    setInterval(refreshAdmins, 15000);
 
-        // 自動搜尋引擎型號
-        function autoFillEngine() {
-            const model = document.getElementById('modelInput').value.trim().toUpperCase();
-            const reg = document.getElementById('regInput').value.trim().toUpperCase();
-            const btn = document.getElementById('autoFillBtn');
-            
-            if (!model && !reg) {
-                alert('請先輸入飛機型號或註冊號');
-                return;
+    // ✈️ 航空公司簡稱 → 全稱建議（撳一下自動填）
+    var airlineTimer = null;
+    document.getElementById('airlineInput').addEventListener('input', function() {
+      clearTimeout(airlineTimer);
+      var q = this.value.trim();
+      var box = document.getElementById('airlineSuggest');
+      if (q.length < 1) { box.textContent = ''; box.onclick = null; return; }
+      airlineTimer = setTimeout(function() {
+        fetch('/api/airline-name?q=' + encodeURIComponent(q))
+          .then(function(r) { return r.json(); })
+          .then(function(d) {
+            if (d.name && d.name !== q) {
+              box.textContent = '💡 係咪想搵：' + d.name + '（撳我自動填入）';
+              box.onclick = function() {
+                document.getElementById('airlineInput').value = d.name;
+                box.textContent = '✅ 已填入：' + d.name;
+                box.onclick = null;
+              };
+            } else {
+              box.textContent = '';
+              box.onclick = null;
             }
+          })
+          .catch(function() {});
+      }, 400);
+    });
 
-            btn.disabled = true;
-            btn.textContent = '🔍 搜尋中...';
-
-            // 模擬 API 搜尋（實際可接真實航空資料庫）
-            setTimeout(() => {
-                const engineMap = {
-                    'B737': 'CFM56-7B',
-                    'B747': 'GEnx-2B / Trent 1000',
-                    'B777': 'GE90-115B / Trent 800',
-                    'B787': 'GEnx / Trent 1000',
-                    'A320': 'CFM56-5B / V2500',
-                    'A321': 'CFM56-5B / V2500',
-                    'A330': 'Trent 700 / CF6-80E',
-                    'A350': 'Trent XWB',
-                    'A380': 'Trent 900 / GP7200'
-                };
-
-                let engine = '未知引擎型號';
-                for (const [key, value] of Object.entries(engineMap)) {
-                    if (model.includes(key)) {
-                        engine = value;
-                        break;
-                    }
-                }
-
-                document.getElementById('engineInput').value = engine;
-                btn.disabled = false;
-                btn.textContent = '🔍 自動搜尋引擎型號';
-            }, 800);
-        }
-
-        // 上載表單
-        document.getElementById('upload-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const msgDiv = document.getElementById('message');
-            const btn = document.querySelector('.submit-btn');
-            
-            btn.textContent = '⏳ 上載中...';
-            btn.disabled = true;
-
-            try {
-                const res = await fetch('/api/photos/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await res.json();
-                
-                msgDiv.style.display = 'flex';
-                if (data.success) {
-                    msgDiv.className = 'message success';
-                    msgDiv.innerHTML = '✅ ' + data.message;
-                    this.reset();
-                    document.getElementById('preview').style.display = 'none';
-                    document.getElementById('dropZone').classList.remove('has-file');
-                    document.getElementById('fileName').textContent = '';
-                } else {
-                    msgDiv.className = 'message error';
-                    msgDiv.innerHTML = '❌ 上載失敗：' + (data.error || '未知錯誤');
-                }
-                
-            } catch (error) {
-                msgDiv.className = 'message error';
-                msgDiv.innerHTML = '❌ 網絡錯誤，請重試';
+    // 🔍 註冊號自動查詢：航空公司 + 機型 + 塗裝
+    var regTimer = null;
+    document.getElementById('regInput').addEventListener('input', function() {
+      clearTimeout(regTimer);
+      var reg = this.value.trim();
+      if (reg.length < 3) return;
+      regTimer = setTimeout(function() {
+        document.getElementById('regStatus').textContent = '🔍 正在查詢飛機資料…';
+        fetch('/api/aircraft-info?reg=' + encodeURIComponent(reg))
+          .then(function(r) { return r.json(); })
+          .then(function(d) {
+            if (d.found) {
+              if (d.airline) document.getElementById('airlineInput').value = d.airline;
+              if (d.type) document.getElementById('typeInput').value = d.type;
+              // 自動填塗裝（如果用戶未自己填）
+              var liveryInput = document.getElementById('liveryInput');
+              if (d.airline && !liveryInput.value.trim()) {
+                liveryInput.value = d.airline + '標準塗裝';
+              }
+              document.getElementById('regStatus').textContent = '✅ 已自動填入航空公司、機型同塗裝';
+            } else {
+              document.getElementById('regStatus').textContent = '⚠️ 搵唔到呢個註冊號，請手動填寫';
             }
-            
-            btn.textContent = '✈️ 提交審核';
-            btn.disabled = false;
-        });
-    </script>
+          })
+          .catch(function() { document.getElementById('regStatus').textContent = ''; });
+      }, 600);
+    });
+
+    // 機場代碼自動顯示名稱
+    function bindAirport(inputId, labelId) {
+      var timer = null;
+      document.getElementById(inputId).addEventListener('input', function() {
+        clearTimeout(timer);
+        var code = this.value.trim();
+        if (code.length < 3) { document.getElementById(labelId).textContent = ''; return; }
+        timer = setTimeout(function() {
+          fetch('/api/airport-name?code=' + encodeURIComponent(code))
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              document.getElementById(labelId).textContent = d.name ? '📍 ' + d.name : '';
+            })
+            .catch(function() {});
+        }, 400);
+      });
+    }
+    bindAirport('originInput', 'originName');
+    bindAirport('destInput', 'destName');
+    bindAirport('apCodeInput', 'apCodeName');
+    bindAirport('tmCodeInput', 'tmCodeName');
+    bindAirport('gdCodeInput', 'gdCodeName');
+  </script>
 </body>
-</html>

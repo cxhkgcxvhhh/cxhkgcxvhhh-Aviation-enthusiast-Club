@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我們的攝影師 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
+      background: linear-gradient(180deg, #f4f8fc, #ffffff);
+      min-height: 100vh;
+      color: #1a2b3c;
+    }
+    .wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a2b3c;
+      border-left: 4px solid #1976d2;
+      padding-left: 12px;
+      margin-bottom: 8px;
+    }
+    .page-sub {
+      font-size: 14px;
+      color: #5f7285;
+      margin-bottom: 28px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e3eaf2;
+      border-radius: 14px;
+      padding: 28px 20px;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+      display: block;
+    }
+    .card:hover {
+      border-color: #1976d2;
+      box-shadow: 0 6px 18px rgba(25, 118, 210, 0.10);
+      transform: translateY(-3px);
+    }
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #e3eaf2;
+      color: #1976d2;
+      font-size: 28px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      overflow: hidden;
+      border: 3px solid #e3eaf2;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a2b3c;
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+    .badge-admin {
+      display: inline-block;
+      font-size: 11px;
+      color: #b8860b;
+      border: 1px solid #e6c860;
+      background: #fffbe8;
+      border-radius: 12px;
+      padding: 2px 10px;
+      margin-bottom: 8px;
+    }
+    .score-badge {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1976d2;
+      background: #e8f0fe;
+      border: 1px solid #c5d9f5;
+      border-radius: 14px;
+      padding: 3px 14px;
+      margin-bottom: 8px;
+    }
+    .score-badge.low {
+      color: #d32f2f;
+      background: #fff0f0;
+      border-color: #f5c6c6;
+    }
+    .count {
+      font-size: 13px;
+      color: #5f7285;
+    }
+    .empty {
+      text-align: center;
+      color: #5f7285;
+      padding: 60px 20px;
+      background: #ffffff;
+      border: 1px dashed #e3eaf2;
+      border-radius: 14px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="wrap">
+    <div class="page-title">📸 我們的攝影師</div>
+    <p class="page-sub">所有已註冊嘅會員都會喺呢度，撳入去就可以睇到佢哋審核通過嘅作品！</p>
+
+    <% if (photographers.length === 0) { %>
+      <div class="empty">暫時仲未有攝影師註冊，快啲做第一個啦！✈️</div>
+    <% } else { %>
+      <div class="grid">
+        <% photographers.forEach(p => { %>
+          <a class="card" href="/user/<%= p.id %>">
+            <div class="avatar" data-initial="<%= p.name.charAt(0) %>">
+              <% if (p.avatar) { %>
+                <img src="<%= p.avatar %>" alt="<%= p.name %>" referrerpolicy="no-referrer"
+                     onerror="this.onerror=null;this.remove();">
+              <% } else { %>
+                <%= p.name.charAt(0) %>
+              <% } %>
+            </div>
+            <div class="name"><%= p.name %></div>
+            <% if (p.role === 'admin') { %>
+              <div class="badge-admin">👑 管理員</div>
+            <% } else { %>
+              <div><span class="score-badge <%= (p.score != null && p.score <= 0) ? 'low' : '' %>">⭐ <%= p.score == null ? '—' : p.score %> 分</span></div>
+            <% } %>
+            <div class="count">📷 <%= p.photoCount %> 張作品</div>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <script>
+    document.querySelectorAll('.avatar').forEach(function(el) {
+      var img = el.querySelector('img');
+      if (img) {
+        img.addEventListener('error', function() {
+          el.textContent = el.getAttribute('data-initial');
+        });
+        if (img.complete && img.naturalWidth === 0) {
+          el.textContent = el.getAttribute('data-initial');
+        }
+      }
+    });
+  </script>
+</body>
+</html>

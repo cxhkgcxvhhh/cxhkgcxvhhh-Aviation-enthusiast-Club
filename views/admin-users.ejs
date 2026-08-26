@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員管理 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
+      background: linear-gradient(180deg, #f4f8fc, #ffffff);
+      min-height: 100vh;
+      color: #1a2b3c;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px 60px; }
+    .page-title {
+      font-size: 24px; font-weight: 700;
+      border-left: 4px solid #1976d2; padding-left: 12px; margin-bottom: 8px;
+    }
+    .page-sub { font-size: 14px; color: #5f7285; margin-bottom: 24px; }
+    .card {
+      background: #ffffff; border: 1px solid #e3eaf2; border-radius: 14px;
+      padding: 24px; margin-bottom: 28px; overflow-x: auto;
+    }
+    .card h2 { font-size: 17px; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px; }
+    th {
+      text-align: left; padding: 10px 12px; color: #5f7285; font-weight: 600;
+      border-bottom: 2px solid #e3eaf2; white-space: nowrap;
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid #eef3f8; }
+    tr:hover td { background: #f7fafd; }
+    .m-avatar {
+      width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+      vertical-align: middle; margin-right: 8px; border: 2px solid #e3eaf2;
+    }
+    .m-name { font-weight: 600; }
+    .role-super { color: #b8860b; font-weight: 700; }
+    .role-admin { color: #1976d2; font-weight: 600; }
+    .score {
+      display: inline-block; min-width: 34px; text-align: center;
+      padding: 3px 10px; border-radius: 14px; font-weight: 700;
+      background: #e8f0fe; color: #1976d2; border: 1px solid #c5d9f5;
+    }
+    .score.low { background: #fff0f0; color: #d32f2f; border-color: #f5c6c6; }
+    .num { text-align: center; }
+    .num.ok { color: #2e7d32; font-weight: 600; }
+    .num.wait { color: #f9a825; font-weight: 600; }
+    .num.bad { color: #d32f2f; font-weight: 600; }
+    .email-cell { font-family: monospace; font-size: 13px; color: #5f7285; }
+
+    .admin-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #eef3f8; font-size: 14px;
+    }
+    .btn-del {
+      background: transparent; border: 2px solid #d32f2f; color: #d32f2f;
+      border-radius: 18px; padding: 4px 16px; font-size: 13px; cursor: pointer;
+    }
+    .btn-del:hover { background: #d32f2f; color: #fff; }
+    .btn-del:disabled { border-color: #cfdce8; color: #b0bec5; cursor: not-allowed; background: transparent; }
+    .add-form { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .add-form input {
+      flex: 1; min-width: 180px; padding: 10px 12px; font-size: 14px;
+      border: 1px solid #cfdce8; border-radius: 8px; background: #fbfdff; outline: none;
+    }
+    .add-form input:focus { border-color: #1976d2; }
+    .btn-add {
+      background: transparent; border: 2px solid #1976d2; color: #1976d2;
+      border-radius: 20px; padding: 9px 22px; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .btn-add:hover { background: #1976d2; color: #fff; }
+    .msg { font-size: 13px; margin-top: 10px; display: none; }
+    .msg.ok { color: #2e7d32; display: block; }
+    .msg.err { color: #d32f2f; display: block; }
+    .super-note {
+      background: #fffbe8; border: 1px solid #e6c860; border-radius: 10px;
+      padding: 12px 16px; font-size: 13px; color: #7a6510; margin-bottom: 16px;
+    }
+
+    /* ===== 🔍 用戶搜尋 ===== */
+    .search-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 16px;
+    }
+    .search-bar input {
+      flex: 1; min-width: 220px; padding: 11px 14px; font-size: 14px;
+      font-family: inherit;
+      border: 1.5px solid #cfdce8; border-radius: 999px;
+      background: #fbfdff; outline: none;
+    }
+    .search-bar input:focus { border-color: #1976d2; }
+    .filter-chip {
+      padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: inherit;
+      border-radius: 999px; border: 1.5px solid #cfdce8;
+      background: transparent; color: #5f7285;
+      transition: all .15s ease;
+    }
+    .filter-chip:hover { border-color: #1976d2; color: #1976d2; }
+    .filter-chip.active {
+      background: #1976d2; border-color: #1976d2; color: #fff;
+    }
+    .search-count { font-size: 13px; color: #8ba0b3; width: 100%; }
+    tr.hidden-by-search { display: none; }
+
+    /* ===== 🚫 封鎖功能 ===== */
+    .status-ok { color: #2e7d32; font-weight: 600; }
+    .status-banned { color: #d32f2f; font-weight: 700; }
+    .ban-reason {
+      display: block; font-size: 12px; color: #b71c1c; font-weight: 400;
+      margin-top: 3px; max-width: 220px; line-height: 1.5;
+    }
+    .btn-ban {
+      background: transparent; border: 2px solid #d32f2f; color: #d32f2f;
+      border-radius: 18px; padding: 4px 14px; font-size: 13px; cursor: pointer;
+      font-family: inherit; white-space: nowrap;
+    }
+    .btn-ban:hover { background: #d32f2f; color: #fff; }
+    .btn-unban {
+      background: transparent; border: 2px solid #2e7d32; color: #2e7d32;
+      border-radius: 18px; padding: 4px 14px; font-size: 13px; cursor: pointer;
+      font-family: inherit; white-space: nowrap;
+    }
+    .btn-unban:hover { background: #2e7d32; color: #fff; }
+    .no-action { color: #b0bec5; font-size: 13px; }
+
+    .ban-overlay {
+      position: fixed; inset: 0; z-index: 3000;
+      background: rgba(20, 40, 60, 0.45); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .ban-overlay.open { display: flex; }
+    .ban-modal {
+      max-width: 460px; width: 100%;
+      background: rgba(255,255,255,0.97); border-radius: 18px;
+      padding: 28px 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+    .ban-modal h3 { font-size: 18px; color: #c62828; margin-bottom: 6px; }
+    .ban-modal .ban-target { font-size: 14px; color: #34495e; margin-bottom: 14px; }
+    .ban-modal textarea {
+      width: 100%; min-height: 90px; padding: 12px; font-size: 14px;
+      font-family: inherit; border: 1.5px solid #cfdce8; border-radius: 10px;
+      background: #fbfdff; outline: none; resize: vertical;
+    }
+    .ban-modal textarea:focus { border-color: #d32f2f; }
+    .ban-modal .ban-warn { font-size: 12px; color: #8a6d00; margin-top: 8px; }
+    .ban-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .ban-confirm {
+      flex: 1; padding: 11px; border: none; border-radius: 999px;
+      background: #d32f2f; color: #fff; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+    }
+    .ban-confirm:disabled { background: #cfdce8; cursor: not-allowed; }
+    .ban-cancel {
+      flex: 1; padding: 11px; border-radius: 999px; cursor: pointer;
+      background: transparent; border: 1.5px solid #b0bec5; color: #5f7285;
+      font-size: 14px; font-weight: 700; font-family: inherit;
+    }
+    .ban-cancel:hover { background: #eceff1; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="wrap">
+    <div class="page-title">👥 會員管理</div>
+    <p class="page-sub">所有已註冊會員嘅分數同上傳統計（只有管理員可以睇）・ 撳會員名可以睇佢嘅詳細上載紀錄</p>
+
+    <!-- 會員試算表 -->
+    <div class="card">
+      <h2>📊 會員分數試算表</h2>
+
+      <!-- 🔍 用戶搜尋（管理員＋總管理員專用，唔會顯示 email） -->
+      <div class="search-bar">
+        <input type="text" id="memberSearch" placeholder="🔍 用會員名稱或者會員 ID 搜尋…" oninput="filterMembers()">
+        <button class="filter-chip active" id="chipAll" onclick="setFilter('all')">全部會員</button>
+        <button class="filter-chip" id="chipBanned" onclick="setFilter('banned')">🚫 只睇已封鎖</button>
+        <span class="search-count" id="searchCount"></span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>會員</th>
+            <th>身份</th>
+            <th>分數</th>
+            <th class="num">已上傳</th>
+            <th class="num">✅ 已通過</th>
+            <th class="num">⏳ 待審核</th>
+            <th class="num">❌ 已拒絕</th>
+            <% if (user.isSuper) { %><th>電郵</th><% } %>
+            <th>狀態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (members.length === 0) { %>
+            <tr><td colspan="10" style="text-align:center;color:#8ba0b3;padding:30px;">暫時未有會員登入過</td></tr>
+          <% } %>
+          <% members.forEach(m => { %>
+            <tr class="member-row" data-name="<%= m.name.toLowerCase() %>" data-id="<%= m.id %>" data-banned="<%= m.banned ? '1' : '' %>">
+              <td>
+                <% if (m.avatar) { %>
+                  <img class="m-avatar" src="<%= m.avatar %>" alt="" referrerpolicy="no-referrer"
+                       onerror="this.onerror=null;this.remove();">
+                <% } %>
+                <a href="/admin/user/<%= m.id %>" class="m-name" style="color:#1976d2;text-decoration:none;" title="撳入去睇詳細上載紀錄"><%= m.name %></a>
+              </td>
+              <td>
+                <% if (m.isSuper) { %><span class="role-super">👑 總管理員</span>
+                <% } else if (m.role === 'admin') { %><span class="role-admin">👑 管理員</span>
+                <% } else { %>會員<% } %>
+              </td>
+              <td>
+                <% if (m.role === 'admin') { %>
+                  <span style="color:#8ba0b3;">另計</span>
+                <% } else { %>
+                  <span class="score <%= (m.score != null && m.score <= 0) ? 'low' : '' %>"><%= m.score == null ? '—' : m.score %></span>
+                <% } %>
+              </td>
+              <td class="num"><%= m.uploaded %></td>
+              <td class="num ok"><%= m.approved %></td>
+              <td class="num wait"><%= m.pending %></td>
+              <td class="num bad"><%= m.rejected %></td>
+              <% if (user.isSuper) { %>
+                <td class="email-cell"><%= m.email || '—' %></td>
+              <% } %>
+              <td>
+                <% if (m.banned) { %>
+                  <span class="status-banned">🚫 已封鎖</span>
+                  <span class="ban-reason">原因：<%= m.banned.reason %><br>由 <%= m.banned.by %> 於 <%= new Date(m.banned.at).toLocaleString('zh-HK') %></span>
+                <% } else { %>
+                  <span class="status-ok">✅ 正常</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (m.role === 'admin') { %>
+                  <span class="no-action">—</span>
+                <% } else if (m.banned) { %>
+                  <button class="btn-unban" onclick="unbanUser('<%= m.id %>', '<%= m.name.replace(/'/g, '') %>')">✅ 解除封鎖</button>
+                <% } else { %>
+                  <button class="btn-ban" onclick="openBanModal('<%= m.id %>', '<%= m.name.replace(/'/g, '') %>')">🚫 封鎖</button>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+          <tr id="noResultRow" style="display:none;"><td colspan="10" style="text-align:center;color:#8ba0b3;padding:30px;">🔍 搵唔到符合嘅會員</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 總管理員專區：管理員名單管理 -->
+    <% if (user.isSuper && adminList) { %>
+      <div class="card">
+        <h2>👑 管理員名單管理（總管理員專用）</h2>
+        <div class="super-note">
+          只有你可以新增或刪除管理員，同埋只有你可以睇到會員電郵。<br>
+          ⚠️ 新管理員用 Google 登入嗰陣，**顯示名稱同電郵**要同你輸入嘅完全一樣先會生效。
+        </div>
+
+        <% adminList.forEach(a => { %>
+          <div class="admin-row">
+            <span>
+              <% if (a.isSuper) { %>👑 <strong><%= a.name %></strong>（總管理員）<% } else { %>🛡️ <%= a.name %><% } %>
+              — <span class="email-cell"><%= a.email %></span>
+            </span>
+            <% if (a.isSuper) { %>
+              <button class="btn-del" disabled>唔可以刪除自己</button>
+            <% } else { %>
+              <button class="btn-del" onclick="removeAdmin('<%= a.email %>')">刪除</button>
+            <% } %>
+          </div>
+        <% }) %>
+
+        <div class="add-form">
+          <input type="text" id="newAdminName" placeholder="管理員顯示名稱（同 Google 帳戶一樣）">
+          <input type="text" id="newAdminEmail" placeholder="管理員 Gmail 電郵">
+          <button class="btn-add" onclick="addAdmin()">＋ 新增管理員</button>
+        </div>
+        <p class="msg" id="adminMsg"></p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- 🚫 封鎖原因彈窗 -->
+  <div class="ban-overlay" id="banOverlay">
+    <div class="ban-modal">
+      <h3>🚫 封鎖會員</h3>
+      <div class="ban-target" id="banTarget">—</div>
+      <textarea id="banReason" placeholder="請填寫封鎖原因（必填），例如：多次上載與航空無關嘅相片" oninput="checkBanReason()"></textarea>
+      <div class="ban-warn">⚠️ 封鎖原因係必填嘅，而且會電郵通知該會員。</div>
+      <div class="ban-actions">
+        <button class="ban-cancel" onclick="closeBanModal()">取消</button>
+        <button class="ban-confirm" id="banConfirmBtn" disabled onclick="confirmBan()">確認封鎖</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 🔍 用戶搜尋 =====
+    var currentFilter = 'all';
+
+    function setFilter(f) {
+      currentFilter = f;
+      document.getElementById('chipAll').classList.toggle('active', f === 'all');
+      document.getElementById('chipBanned').classList.toggle('active', f === 'banned');
+      filterMembers();
+    }
+
+    function filterMembers() {
+      var q = document.getElementById('memberSearch').value.trim().toLowerCase();
+      var rows = document.querySelectorAll('.member-row');
+      var shown = 0;
+      rows.forEach(function (row) {
+        var matchQ = !q || row.dataset.name.indexOf(q) !== -1 || row.dataset.id.indexOf(q) !== -1;
+        var matchF = currentFilter === 'all' || row.dataset.banned === '1';
+        var show = matchQ && matchF;
+        row.classList.toggle('hidden-by-search', !show);
+        if (show) shown++;
+      });
+      document.getElementById('noResultRow').style.display = shown === 0 ? '' : 'none';
+      document.getElementById('searchCount').textContent =
+        (q || currentFilter !== 'all') ? '顯示緊 ' + shown + ' / ' + rows.length + ' 位會員' : '';
+    }
+
+    function showMsg(text, ok) {
+      var el = document.getElementById('adminMsg');
+      el.textContent = text;
+      el.className = 'msg ' + (ok ? 'ok' : 'err');
+    }
+
+    // ===== 🚫 封鎖／解封 =====
+    var banTargetId = null;
+
+    function openBanModal(id, name) {
+      banTargetId = id;
+      document.getElementById('banTarget').innerHTML = '你即將封鎖：<b>' + name + '</b>';
+      document.getElementById('banReason').value = '';
+      document.getElementById('banConfirmBtn').disabled = true;
+      document.getElementById('banOverlay').classList.add('open');
+    }
+    function closeBanModal() {
+      document.getElementById('banOverlay').classList.remove('open');
+      banTargetId = null;
+    }
+    function checkBanReason() {
+      document.getElementById('banConfirmBtn').disabled =
+        document.getElementById('banReason').value.trim().length === 0;
+    }
+    function confirmBan() {
+      var reason = document.getElementById('banReason').value.trim();
+      if (!reason || !banTargetId) return;
+      fetch('/api/admin/users/' + banTargetId + '/ban', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason })
+      }).then(r => r.json()).then(d => {
+        if (d.ok) { closeBanModal(); location.reload(); }
+        else alert('❌ ' + (d.error || '失敗'));
+      }).catch(() => alert('❌ 網絡錯誤'));
+    }
+    function unbanUser(id, name) {
+      if (!confirm('確定要解除 ' + name + ' 嘅封鎖？')) return;
+      fetch('/api/admin/users/' + id + '/unban', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}'
+      }).then(r => r.json()).then(d => {
+        if (d.ok) location.reload();
+        else alert('❌ ' + (d.error || '失敗'));
+      }).catch(() => alert('❌ 網絡錯誤'));
+    }
+    document.getElementById('banOverlay').addEventListener('click', function (e) {
+      if (e.target === this) closeBanModal();
+    });
+
+    function addAdmin() {
+      var name = document.getElementById('newAdminName').value.trim();
+      var email = document.getElementById('newAdminEmail').value.trim();
+      if (!name || !email) { showMsg('請填晒名稱同電郵', false); return; }
+      fetch('/api/superadmin/admins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email })
+      }).then(r => r.json()).then(d => {
+        if (d.ok) { showMsg('✅ 已新增管理員：' + name, true); setTimeout(() => location.reload(), 800); }
+        else showMsg('❌ ' + (d.error || '失敗'), false);
+      }).catch(() => showMsg('❌ 網絡錯誤', false));
+    }
+    function removeAdmin(email) {
+      if (!confirm('確定要刪除管理員 ' + email + '？')) return;
+      fetch('/api/superadmin/admins/remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      }).then(r => r.json()).then(d => {
+        if (d.ok) { showMsg('✅ 已刪除', true); setTimeout(() => location.reload(), 800); }
+        else showMsg('❌ ' + (d.error || '失敗'), false);
+      }).catch(() => showMsg('❌ 網絡錯誤', false));
+    }
+  </script>
+</body>
+</html>

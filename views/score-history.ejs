@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分數紀錄 — cxhkgcxvhhh Aviation enthusiast Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft JhengHei', 'PingFang HK', Arial, sans-serif; background: #f4f8fc; color: #1a2b3c; }
+    .wrap { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .page-head h1 { font-size: 22px; color: #0d2137; }
+    .back-link { font-size: 13px; color: #1976d2; text-decoration: none; font-weight: 700; }
+    .back-link:hover { text-decoration: underline; }
+    .card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 8px 30px rgba(25,60,100,0.10); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; color: #5f7285; font-size: 12px; border-bottom: 2px solid #e3ecf5; white-space: nowrap; }
+    td { padding: 10px 12px; border-bottom: 1px solid #eef3f8; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .d-pos { color: #2e7d32; font-weight: 800; }
+    .d-neg { color: #c62828; font-weight: 800; }
+    .reason { color: #1a2b3c; }
+    .by { color: #5f7285; font-size: 12px; }
+    .time { color: #8ba0b3; font-size: 12px; white-space: nowrap; }
+    .empty { color: #8ba0b3; font-size: 13px; padding: 20px 0; text-align: center; }
+    .note { font-size: 12px; color: #8ba0b3; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="wrap">
+    <div class="page-head">
+      <h1>📜 分數紀錄<%= isAdminView ? '（全部會員）' : '' %></h1>
+      <a class="back-link" href="/profile">← 返回個人檔案</a>
+    </div>
+
+    <div class="card">
+      <% if (records.length === 0) { %>
+        <div class="empty">暫時未有分數變動紀錄</div>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>時間</th>
+              <% if (isAdminView) { %><th>會員</th><% } %>
+              <th>變化</th>
+              <th>之後分數</th>
+              <th>原因</th>
+              <th>執行者</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% records.forEach(r => { %>
+              <tr>
+                <td class="time"><%= new Date(r.at).toLocaleString('zh-HK') %></td>
+                <% if (isAdminView) { %><td><a href="/user/<%= r.user_id %>" style="color:#1976d2;text-decoration:none;font-weight:700;"><%= r.user_name %></a></td><% } %>
+                <td class="<%= r.delta >= 0 ? 'd-pos' : 'd-neg' %>"><%= r.delta >= 0 ? '+' : '' %><%= r.delta %></td>
+                <td><%= r.score_after %></td>
+                <td class="reason"><%= r.reason %></td>
+                <td class="by"><%= r.by %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+      <p class="note">💡 通過審核、集讚獎勵等都會自動記低；管理員可以睇到全部會員嘅紀錄。</p>
+    </div>
+  </div>
+</body>
+</html>
