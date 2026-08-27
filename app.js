@@ -10,6 +10,12 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const sharp = require('sharp');
 const nodemailer = require('nodemailer');
 const exifr = require('exifr');
