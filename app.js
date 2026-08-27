@@ -2,6 +2,7 @@
 // cxhkgcxvhhh Aviation enthusiast Club
 // 正式上線版本（彩色 HTML 電郵通知＋硬碟資料保存＋封鎖用戶）
 // ============================================
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -12,7 +13,6 @@ const fs = require('fs');
 const sharp = require('sharp');
 const nodemailer = require('nodemailer');
 const exifr = require('exifr');
-
 const app = express();
 const PORT = 3000;
 
@@ -96,7 +96,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: 'cxcv-aviation-secret-key-change-me',
   resave: false,
   saveUninitialized: false
 }));
@@ -616,13 +616,21 @@ async function addWatermark(imagePath, photographerName) {
     const rightText = escapeXml('cxhkgcxvhhh Aviation enthusiast Club');
     const padding = Math.max(8, Math.round(barHeight * 0.3));
 
-    const svg = '<svg width="' + width + '" height="' + barHeight + '">' +
-      '<rect x="0" y="0" width="' + width + '" height="' + barHeight + '" fill="#000000" fill-opacity="0.85"/>' +
-      '<text x="' + padding + '" y="' + Math.round(barHeight / 2) + '" dy="0.35em" ' +
-      'font-family="Arial, Helvetica, sans-serif" font-size="' + fontSize + '" fill="#ffffff">' + leftText + '</text>' +
-      '<text x="' + (width - padding) + '" y="' + Math.round(barHeight / 2) + '" dy="0.35em" ' +
-      'text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="' + fontSize + '" fill="#ffffff">' + rightText + '</text>' +
-      '</svg>';
+   const fontPath = path.join(__dirname, 'fonts', 'ARIAL.TTF');
+let fontFace = '';
+if (fs.existsSync(fontPath)) {
+    const fontBase64 = fs.readFileSync(fontPath).toString('base64');
+    fontFace = '@font-face { font-family: "EmbedFont"; src: url("data:font/truetype;base64,' + fontBase64 + '"); }';
+}
+
+const svg = '<svg width="' + width + '" height="' + barHeight + '" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><style>' + fontFace + '</style></defs>' +
+    '<rect x="0" y="0" width="' + width + '" height="' + barHeight + '" fill="#000000" fill-opacity="0.7"/>' +
+    '<text x="' + padding + '" y="' + Math.round(barHeight / 2) + '" dy="0.35em" ' +
+    'font-family="EmbedFont, Arial, sans-serif" font-size="' + fontSize + '" fill="#ffffff">' + leftText + '</text>' +
+    '<text x="' + (width - padding) + '" y="' + Math.round(barHeight / 2) + '" dy="0.35em" ' +
+    'text-anchor="end" font-family="EmbedFont, Arial, sans-serif" font-size="' + fontSize + '" fill="#ffffff">' + rightText + '</text>' +
+    '</svg>';
 
     const tmpPath = imagePath + '.tmp';
     await image
